@@ -1,5 +1,16 @@
+EXAMPLE INPUT (EZY language)
+var a,b;
+var c;
+% following procedure ensures that x&lt;= y on return
+proc order(inout x, inout y)
+
+---------------------------------------------------------------
+
 1. Lexical analysis using flex 
 INPUT: A line of code?
+
+- Get started with FLEX-YACC python libraries 
+
 OUTPUT: Lexemes and corresponding sequence of tokens 
 
 2. Parser 
@@ -13,3 +24,14 @@ INPUT: Sequence of Tokens
 OUTPUT: Parse Tree 
 
 3. Semantic Checker and Code Generator 
+
+
+---------------------------------------------------------------
+EXAMPLE OUTPUT (via EVM)
+LPUT “enter two numbers”
+GET $0
+GET $1
+MOV A,I
+ADI 6
+PUSH A
+PUSH $0
