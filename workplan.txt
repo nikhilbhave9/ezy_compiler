@@ -1,0 +1,15 @@
+1. Lexical analysis using flex 
+INPUT: A line of code?
+OUTPUT: Lexemes and corresponding sequence of tokens 
+
+2. Parser 
+INPUT: Sequence of Tokens 
+
+- Use predictive parsing or a custom approach 
+- Convert non-LL(1) to LL(1)
+- Create Symbol Table and apply basic semantic checks
+- 
+
+OUTPUT: Parse Tree 
+
+3. Semantic Checker and Code Generator 
