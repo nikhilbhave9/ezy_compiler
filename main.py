@@ -35,7 +35,7 @@ reserved = {
 #    #'MODE', # --
 # )
 
-tokens = ['NUMBER', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'COMP', 'EQUALS', 'LPAREN', 'RPAREN', 'ID', 'LABEL', 'COMMENT'] + list(reserved.values())
+tokens = ['NUMBER', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'COMP', 'EQUALS', 'LPAREN', 'RPAREN', 'ID', 'LABEL', 'COMMENT', 'DLABEL'] + list(reserved.values())
 
 # Regular expression rules for simple tokens
 # ==========================================
@@ -48,15 +48,9 @@ t_EQUALS  = r'\='
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 
-# Regular expression string containing ignored characters (spaces and tabs)
-# ==========================================
-t_ignore  = ' \t'
 
-# Regular expression to ignore comments 
-# ==========================================
-def t_COMMENT(t): 
-    r'\#.*'
-    return t
+
+
 
 # Regular expression rules with some action code
 # ==========================================
@@ -65,24 +59,50 @@ def t_NUMBER(t):
     t.value = int(t.value)
     return t
 
+# Define a rule for identifiers
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'ID') 
+    # for label in labels:
+    #     if t.value == label:
+    #         t.type = 'LABEL'
+    # .get() method is called on a dictionary to get the value of given key ()
+    # First parameter is the key
+    # Second parameter is optional. It returns a value if key doesn't exist
+    return t
+
 # Define a rule so we can track line numbers
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-# Define a rule for identifiers
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value, 'ID') 
-    # .get() method is called on a dictionary to get the value of given key ()
-    # First parameter is the key
-    # Second parameter is optional. It returns a value if key doesn't exist
+# Regular expression string containing ignored characters (spaces and tabs)
+# ==========================================
+t_ignore  = ' \t'
+
+# Regular expression to ignore comments 
+# ==========================================
+# def t_COMMENT(t): 
+#     r'\#.*'
+#     return t   
+t_ignore_COMMENT = r'\#.*'
+
+
+# Regular expression to collect dLabels
+# ==========================================
+def t_DLABEL(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*.:'
+    string = t.value 
+    string = string[:-1]
+    t.value = string 
     return t
 
 # Error handling rule
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
+
+
 
 
 # ======================= End of Token Definitions ======================= 
@@ -96,8 +116,10 @@ def t_error(t):
 lexer = lex.lex()
 
 # Testing (you can use triple quotes as a string)
-data = '50 == 50 = 7'
-# '''# This is a comment 
+data = '''
+if 50 == 50
+50 == 50 = 7
+'''# This is a comment 
 # 56
 # '''
 
