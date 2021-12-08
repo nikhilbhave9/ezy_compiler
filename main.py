@@ -20,22 +20,22 @@ reserved = {
 
 # List of token names 
 # Tokens still to be added: COMMA, COLON
-tokens = (
-   'NUMBER',
-   'PLUS',
-   'MINUS',
-   'TIMES',
-   'DIVIDE',
-   'COMP',
-   'EQUALS',
-   'LPAREN',
-   'RPAREN',
-   'ID',
-   'LABEL', # Might have to re-order 
-   #'MODE', # --
-)
+# tokens = (
+#    'NUMBER',
+#    'PLUS',
+#    'MINUS',
+#    'TIMES',
+#    'DIVIDE',
+#    'COMP',
+#    'EQUALS',
+#    'LPAREN',
+#    'RPAREN',
+#    'ID',
+#    'LABEL', # Might have to re-order 
+#    #'MODE', # --
+# )
 
-# tokens = [] + list(reserved.values())
+tokens = ['NUMBER', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'COMP', 'EQUALS', 'LPAREN', 'RPAREN', 'ID', 'LABEL', 'COMMENT'] + list(reserved.values())
 
 # Regular expression rules for simple tokens
 # ==========================================
@@ -51,6 +51,12 @@ t_RPAREN  = r'\)'
 # Regular expression string containing ignored characters (spaces and tabs)
 # ==========================================
 t_ignore  = ' \t'
+
+# Regular expression to ignore comments 
+# ==========================================
+def t_COMMENT(t): 
+    r'\#.*'
+    return t
 
 # Regular expression rules with some action code
 # ==========================================
@@ -82,7 +88,7 @@ def t_error(t):
 # ======================= End of Token Definitions ======================= 
 
 # ==========================================
-# Building the lexer and start parsing
+# Building the lexer and start analysing
 # ==========================================
 
 
@@ -90,7 +96,15 @@ def t_error(t):
 lexer = lex.lex()
 
 # Testing (you can use triple quotes as a string)
-data = "20 = 30 + 40 == 50"
+data = '50 == 50 = 7'
+# '''# This is a comment 
+# 56
+# '''
+
+# # This is a comment
+# 3 + 4 * 10
+# x = 20 * 2
+
 
 # Give the lexer some input
 lexer.input(data)
