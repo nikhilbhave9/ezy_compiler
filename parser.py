@@ -1,30 +1,32 @@
 import lexical_analyser
+from lexical_analyser import tokens
 from lexical_analyser import lexer
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
 
 # Tokenize
-while True:
-    tok = lexical_analyser.lexer.token()
-    if not tok:
-        break      # No more input
-    print(tok)     # Prints in the following format: TYPE OF TOKEN + VALUE + LINE NUMBER + LINE POSITION
+# while True:
+#     tok = lexer.token()
+#     if not tok:
+#         break      # No more input
+#     print(tok)     # Prints in the following format: TYPE OF TOKEN + VALUE + LINE NUMBER + LINE POSITION
 
-
-def p_empty(p):
-    'empty:'
-    pass
+start = 'prog'
 
 def p_prog(p):
     '''
-    prog: vardecls procdecls BEGIN stmtlist END
+    prog    : vardecls procdecls BEGIN stmtlist END
     '''
+
+def p_empty(p):
+    'empty  :'
+    pass
 
 def p_vardecls(p):
     '''
-    vardecls: vardecl vardecls
-            | empty
+    vardecls    : vardecl vardecls
+                | empty
     '''
 
 def p_vardecl(p):
@@ -116,7 +118,7 @@ def p_assign(p):
 
 def p_condjump(p):
     '''
-    condjump: IF ID cmpop ID GOTO LABEL
+    condjump    : IF ID cmpop ID GOTO LABEL
     '''
 
 def p_jump(p):
@@ -141,12 +143,6 @@ def p_printarg(p):
                 | STRING
     '''
 
-def p_printarg(p):
-    '''
-    printarg    : ID
-                | STRING
-    '''
-
 def p_callstmt(p):
     '''
     callstmt    : CALL ID LPAREN arglist RPAREN
@@ -154,7 +150,8 @@ def p_callstmt(p):
 
 def p_arglist(p):
     '''
-    callstmt    : CALL ID LPAREN arglist RPAREN
+    arglist : targlist
+            | empty
     '''
 
 def p_targlist(p):
@@ -186,3 +183,52 @@ def p_opd(p):
     opd : ID
         | NUM
     '''
+
+def p_error(p):
+    print("Syntax error in input!")
+
+parser = yacc.yacc(debug=True)
+
+data = ''' var a,b;
+var c;
+% following procedure ensures that x<= y on return
+proc order(inout x, inout y)
+var t;
+if x < y goto done;
+t= x+0;
+x = y+0;
+y = t+0;
+done:
+return;
+begin
+print "enter two numbers ";
+println;
+read a ;
+read b ;
+call order(a,b);
+%now a <= b
+c=b/a ;
+c = c*a ;
+c = b - c ;
+print "absolute mod is " ;
+print c;
+println ;
+exit ;
+end
+'''
+
+data2 = '''var a, b;
+begin
+print "hello world ";
+end
+'''
+res = parser.parse(data2, lexer)
+print(res)
+# while True:
+#     try:
+#        s = input()
+#     except EOFError:
+#        break
+#     if not s: continue
+#     result = parser.parse(s, lexer)
+#     print(result)
