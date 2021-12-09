@@ -18,6 +18,7 @@ def p_prog(p):
     '''
     prog    : vardecls procdecls BEGIN stmtlist END
     '''
+    p[0] = ('prog', p[1], p[2], 'begin', p[4], 'end')
 
 def p_empty(p):
     'empty  :'
@@ -28,17 +29,26 @@ def p_vardecls(p):
     vardecls    : vardecl vardecls
                 | empty
     '''
+    if(len(p) > 2):
+        p[0] = ('vardecls', p[1], p[2])
+    else:
+        p[0] = ('vardecls', p[1])
 
 def p_vardecl(p):
     '''
     vardecl : VAR varlist SEMICOLON
     '''
+    p[0] = ('vardecl', p[2])
 
 def p_varlist(p):
     '''
     varlist : ID COMMA varlist
             | ID
     '''
+    if(len(p) > 2):
+        p[0] = ('varlist', p[1], p[3])
+    else:
+        p[0] = ('varlist', p[1])
 
 def p_procdecls(p):
     '''
@@ -86,6 +96,10 @@ def p_stmtlist(p):
     stmtlist    : mstmt stmtlist
                 | mstmt
     '''
+    if(len(p) > 2):
+        p[0] = ('stmtlist', p[1], p[2])
+    else:
+        p[0] = ('stmtlist', p[1])
 
 def p_pstmt(p):
     '''
@@ -99,6 +113,7 @@ def p_mstmt(p):
     mstmt   : DLABEL
             | stmt SEMICOLON
     '''
+    p[0] = ('mstmt', p[1])
 
 def p_stmt(p):
     '''
@@ -110,6 +125,7 @@ def p_stmt(p):
             | callstmt
             | EXIT
     '''
+    p[0] = ('stmt', p[1])
 
 def p_assign(p):
     '''
@@ -136,12 +152,17 @@ def p_printstmt(p):
     printstmt   : PRINT printarg
                 | PRINTLN
     '''
+    if(len(p) == 3):
+        p[0] = ('printstmt',p[1], p[2])
+    else:
+        p[0] = ('printstmt', p[1])
 
 def p_printarg(p):
     '''
     printarg    : ID
                 | STRING
     '''
+    p[0] = ('printarg', p[1])
 
 def p_callstmt(p):
     '''
@@ -219,7 +240,8 @@ end
 
 data2 = '''var a, b;
 begin
-print "hello world ";
+a = 3 + 3;
+print a;
 end
 '''
 res = parser.parse(data2, lexer)
@@ -232,3 +254,5 @@ print(res)
 #     if not s: continue
 #     result = parser.parse(s, lexer)
 #     print(result)
+
+('prog', ('vardecls', ('vardecl', ('varlist', 'a')), ('vardecls', None)), None, 'begin', ('stmtlist', ('mstmt', ('stmt', None)), ('stmtlist', ('mstmt', ('stmt', ('printstmt', 'print', ('printarg', 'a')))))), 'end')
