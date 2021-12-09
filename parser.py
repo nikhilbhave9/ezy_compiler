@@ -12,13 +12,23 @@ import sys
 #         break      # No more input
 #     print(tok)     # Prints in the following format: TYPE OF TOKEN + VALUE + LINE NUMBER + LINE POSITION
 
+# class Node:
+#     def __init__(self,type,children=None,leaf=None):
+#          self.type = type
+#          if children:
+#               self.children = children
+#          else:
+#               self.children = [ ]
+#          self.leaf = leaf
+
 start = 'prog'
 
 def p_prog(p):
     '''
     prog    : vardecls procdecls BEGIN stmtlist END
     '''
-    p[0] = ('prog', p[1], p[2], 'begin', p[4], 'end')
+    print('debug', len(p[1]))
+    p[0] = ('prog', p[1], p[2], p[3], p[4], p[5])
 
 def p_empty(p):
     'empty  :'
@@ -29,8 +39,11 @@ def p_vardecls(p):
     vardecls    : vardecl vardecls
                 | empty
     '''
-    if(len(p) > 2):
-        p[0] = ('vardecls', p[1], p[2])
+    if(len(p) == 3):
+        if(p[2][1] == None):
+            p[0] = ('vardecls', p[1])
+        else:
+            p[0] = ('vardecls', p[1], p[2][1])
     else:
         p[0] = ('vardecls', p[1])
 
@@ -46,7 +59,7 @@ def p_varlist(p):
             | ID
     '''
     if(len(p) > 2):
-        p[0] = ('varlist', p[1], p[3])
+        p[0] = ('varlist', p[1], p[3][1])
     else:
         p[0] = ('varlist', p[1])
 
@@ -55,11 +68,19 @@ def p_procdecls(p):
     procdecls   : procdecl procdecls
                 | empty
     '''
+    if(len(p) == 3):
+        if(p[2][1] == None):
+            p[0] = ('procdecls', p[1])
+        else:
+            p[0] = ('procdecls', p[1], p[2][1])
+    else:
+        p[0] = ('procdecls', p[1])
 
 def p_procdel(p):
     '''
     procdecl    : PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
     '''
+    
 
 def p_paramlist(p):
     '''
@@ -246,6 +267,7 @@ end
 '''
 res = parser.parse(data2, lexer)
 print(res)
+
 # while True:
 #     try:
 #        s = input()
