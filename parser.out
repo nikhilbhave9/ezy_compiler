@@ -1,0 +1,1209 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> prog
+Rule 1     prog -> vardecls procdecls BEGIN stmtlist END
+Rule 2     empty -> <empty>
+Rule 3     vardecls -> vardecl vardecls
+Rule 4     vardecls -> empty
+Rule 5     vardecl -> VAR varlist SEMICOLON
+Rule 6     varlist -> ID COMMA varlist
+Rule 7     varlist -> ID
+Rule 8     procdecls -> procdecl procdecls
+Rule 9     procdecls -> empty
+Rule 10    procdecl -> PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
+Rule 11    paramlist -> tparamlist
+Rule 12    paramlist -> empty
+Rule 13    tparamlist -> param COMMA tparamlist
+Rule 14    tparamlist -> param
+Rule 15    param -> mode ID
+Rule 16    mode -> IN
+Rule 17    mode -> OUT
+Rule 18    mode -> INOUT
+Rule 19    pstmtlist -> pstmt pstmtlist
+Rule 20    pstmtlist -> pstmt
+Rule 21    stmtlist -> mstmt stmtlist
+Rule 22    stmtlist -> mstmt
+Rule 23    pstmt -> DLABEL
+Rule 24    pstmt -> stmt SEMICOLON
+Rule 25    pstmt -> RETURN SEMICOLON
+Rule 26    mstmt -> DLABEL
+Rule 27    mstmt -> stmt SEMICOLON
+Rule 28    stmt -> assign
+Rule 29    stmt -> condjump
+Rule 30    stmt -> jump
+Rule 31    stmt -> readstmt
+Rule 32    stmt -> printstmt
+Rule 33    stmt -> callstmt
+Rule 34    stmt -> EXIT
+Rule 35    assign -> ID EQUALS opd arithop opd
+Rule 36    condjump -> IF ID cmpop ID GOTO LABEL
+Rule 37    jump -> GOTO LABEL
+Rule 38    readstmt -> READ ID
+Rule 39    printstmt -> PRINT printarg
+Rule 40    printstmt -> PRINTLN
+Rule 41    printarg -> ID
+Rule 42    printarg -> STRING
+Rule 43    callstmt -> CALL ID LPAREN arglist RPAREN
+Rule 44    arglist -> targlist
+Rule 45    arglist -> empty
+Rule 46    targlist -> ID COMMA targlist
+Rule 47    targlist -> ID
+Rule 48    cmpop -> LESSER
+Rule 49    cmpop -> GREATER
+Rule 50    cmpop -> LEQ
+Rule 51    cmpop -> GEQ
+Rule 52    cmpop -> EQUALS
+Rule 53    cmpop -> NEQ
+Rule 54    arithop -> PLUS
+Rule 55    arithop -> MINUS
+Rule 56    arithop -> MULTIPLY
+Rule 57    arithop -> DIVIDE
+Rule 58    opd -> ID
+Rule 59    opd -> NUM
+
+Terminals, with rules where they appear
+
+BEGIN                : 1
+CALL                 : 43
+COMMA                : 6 13 46
+DIVIDE               : 57
+DLABEL               : 23 26
+END                  : 1
+EQUALS               : 35 52
+EXIT                 : 34
+GEQ                  : 51
+GOTO                 : 36 37
+GREATER              : 49
+ID                   : 6 7 10 15 35 36 36 38 41 43 46 47 58
+IF                   : 36
+IN                   : 16
+INOUT                : 18
+LABEL                : 36 37
+LEQ                  : 50
+LESSER               : 48
+LPAREN               : 10 43
+MINUS                : 55
+MULTIPLY             : 56
+NEQ                  : 53
+NUM                  : 59
+OUT                  : 17
+PLUS                 : 54
+PRINT                : 39
+PRINTLN              : 40
+PROC                 : 10
+READ                 : 38
+RETURN               : 25
+RPAREN               : 10 43
+SEMICOLON            : 5 24 25 27
+STRING               : 42
+VAR                  : 5
+error                : 
+
+Nonterminals, with rules where they appear
+
+arglist              : 43
+arithop              : 35
+assign               : 28
+callstmt             : 33
+cmpop                : 36
+condjump             : 29
+empty                : 4 9 12 45
+jump                 : 30
+mode                 : 15
+mstmt                : 21 22
+opd                  : 35 35
+param                : 13 14
+paramlist            : 10
+printarg             : 39
+printstmt            : 32
+procdecl             : 8
+procdecls            : 1 8
+prog                 : 0
+pstmt                : 19 20
+pstmtlist            : 10 19
+readstmt             : 31
+stmt                 : 24 27
+stmtlist             : 1 21
+targlist             : 44 46
+tparamlist           : 11 13
+vardecl              : 3
+vardecls             : 1 3 10
+varlist              : 5 6
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . prog
+    (1) prog -> . vardecls procdecls BEGIN stmtlist END
+    (3) vardecls -> . vardecl vardecls
+    (4) vardecls -> . empty
+    (5) vardecl -> . VAR varlist SEMICOLON
+    (2) empty -> .
+
+    VAR             shift and go to state 5
+    PROC            reduce using rule 2 (empty -> .)
+    BEGIN           reduce using rule 2 (empty -> .)
+
+    prog                           shift and go to state 1
+    vardecls                       shift and go to state 2
+    vardecl                        shift and go to state 3
+    empty                          shift and go to state 4
+
+state 1
+
+    (0) S' -> prog .
+
+
+
+state 2
+
+    (1) prog -> vardecls . procdecls BEGIN stmtlist END
+    (8) procdecls -> . procdecl procdecls
+    (9) procdecls -> . empty
+    (10) procdecl -> . PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
+    (2) empty -> .
+
+    PROC            shift and go to state 9
+    BEGIN           reduce using rule 2 (empty -> .)
+
+    procdecls                      shift and go to state 6
+    procdecl                       shift and go to state 7
+    empty                          shift and go to state 8
+
+state 3
+
+    (3) vardecls -> vardecl . vardecls
+    (3) vardecls -> . vardecl vardecls
+    (4) vardecls -> . empty
+    (5) vardecl -> . VAR varlist SEMICOLON
+    (2) empty -> .
+
+    VAR             shift and go to state 5
+    PROC            reduce using rule 2 (empty -> .)
+    BEGIN           reduce using rule 2 (empty -> .)
+    DLABEL          reduce using rule 2 (empty -> .)
+    RETURN          reduce using rule 2 (empty -> .)
+    EXIT            reduce using rule 2 (empty -> .)
+    ID              reduce using rule 2 (empty -> .)
+    IF              reduce using rule 2 (empty -> .)
+    GOTO            reduce using rule 2 (empty -> .)
+    READ            reduce using rule 2 (empty -> .)
+    PRINT           reduce using rule 2 (empty -> .)
+    PRINTLN         reduce using rule 2 (empty -> .)
+    CALL            reduce using rule 2 (empty -> .)
+
+    vardecl                        shift and go to state 3
+    vardecls                       shift and go to state 10
+    empty                          shift and go to state 4
+
+state 4
+
+    (4) vardecls -> empty .
+
+    PROC            reduce using rule 4 (vardecls -> empty .)
+    BEGIN           reduce using rule 4 (vardecls -> empty .)
+    DLABEL          reduce using rule 4 (vardecls -> empty .)
+    RETURN          reduce using rule 4 (vardecls -> empty .)
+    EXIT            reduce using rule 4 (vardecls -> empty .)
+    ID              reduce using rule 4 (vardecls -> empty .)
+    IF              reduce using rule 4 (vardecls -> empty .)
+    GOTO            reduce using rule 4 (vardecls -> empty .)
+    READ            reduce using rule 4 (vardecls -> empty .)
+    PRINT           reduce using rule 4 (vardecls -> empty .)
+    PRINTLN         reduce using rule 4 (vardecls -> empty .)
+    CALL            reduce using rule 4 (vardecls -> empty .)
+
+
+state 5
+
+    (5) vardecl -> VAR . varlist SEMICOLON
+    (6) varlist -> . ID COMMA varlist
+    (7) varlist -> . ID
+
+    ID              shift and go to state 12
+
+    varlist                        shift and go to state 11
+
+state 6
+
+    (1) prog -> vardecls procdecls . BEGIN stmtlist END
+
+    BEGIN           shift and go to state 13
+
+
+state 7
+
+    (8) procdecls -> procdecl . procdecls
+    (8) procdecls -> . procdecl procdecls
+    (9) procdecls -> . empty
+    (10) procdecl -> . PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
+    (2) empty -> .
+
+    PROC            shift and go to state 9
+    BEGIN           reduce using rule 2 (empty -> .)
+
+    procdecl                       shift and go to state 7
+    procdecls                      shift and go to state 14
+    empty                          shift and go to state 8
+
+state 8
+
+    (9) procdecls -> empty .
+
+    BEGIN           reduce using rule 9 (procdecls -> empty .)
+
+
+state 9
+
+    (10) procdecl -> PROC . ID LPAREN paramlist RPAREN vardecls pstmtlist
+
+    ID              shift and go to state 15
+
+
+state 10
+
+    (3) vardecls -> vardecl vardecls .
+
+    PROC            reduce using rule 3 (vardecls -> vardecl vardecls .)
+    BEGIN           reduce using rule 3 (vardecls -> vardecl vardecls .)
+    DLABEL          reduce using rule 3 (vardecls -> vardecl vardecls .)
+    RETURN          reduce using rule 3 (vardecls -> vardecl vardecls .)
+    EXIT            reduce using rule 3 (vardecls -> vardecl vardecls .)
+    ID              reduce using rule 3 (vardecls -> vardecl vardecls .)
+    IF              reduce using rule 3 (vardecls -> vardecl vardecls .)
+    GOTO            reduce using rule 3 (vardecls -> vardecl vardecls .)
+    READ            reduce using rule 3 (vardecls -> vardecl vardecls .)
+    PRINT           reduce using rule 3 (vardecls -> vardecl vardecls .)
+    PRINTLN         reduce using rule 3 (vardecls -> vardecl vardecls .)
+    CALL            reduce using rule 3 (vardecls -> vardecl vardecls .)
+
+
+state 11
+
+    (5) vardecl -> VAR varlist . SEMICOLON
+
+    SEMICOLON       shift and go to state 16
+
+
+state 12
+
+    (6) varlist -> ID . COMMA varlist
+    (7) varlist -> ID .
+
+    COMMA           shift and go to state 17
+    SEMICOLON       reduce using rule 7 (varlist -> ID .)
+
+
+state 13
+
+    (1) prog -> vardecls procdecls BEGIN . stmtlist END
+    (21) stmtlist -> . mstmt stmtlist
+    (22) stmtlist -> . mstmt
+    (26) mstmt -> . DLABEL
+    (27) mstmt -> . stmt SEMICOLON
+    (28) stmt -> . assign
+    (29) stmt -> . condjump
+    (30) stmt -> . jump
+    (31) stmt -> . readstmt
+    (32) stmt -> . printstmt
+    (33) stmt -> . callstmt
+    (34) stmt -> . EXIT
+    (35) assign -> . ID EQUALS opd arithop opd
+    (36) condjump -> . IF ID cmpop ID GOTO LABEL
+    (37) jump -> . GOTO LABEL
+    (38) readstmt -> . READ ID
+    (39) printstmt -> . PRINT printarg
+    (40) printstmt -> . PRINTLN
+    (43) callstmt -> . CALL ID LPAREN arglist RPAREN
+
+    DLABEL          shift and go to state 20
+    EXIT            shift and go to state 28
+    ID              shift and go to state 29
+    IF              shift and go to state 30
+    GOTO            shift and go to state 31
+    READ            shift and go to state 32
+    PRINT           shift and go to state 33
+    PRINTLN         shift and go to state 34
+    CALL            shift and go to state 35
+
+    stmtlist                       shift and go to state 18
+    mstmt                          shift and go to state 19
+    stmt                           shift and go to state 21
+    assign                         shift and go to state 22
+    condjump                       shift and go to state 23
+    jump                           shift and go to state 24
+    readstmt                       shift and go to state 25
+    printstmt                      shift and go to state 26
+    callstmt                       shift and go to state 27
+
+state 14
+
+    (8) procdecls -> procdecl procdecls .
+
+    BEGIN           reduce using rule 8 (procdecls -> procdecl procdecls .)
+
+
+state 15
+
+    (10) procdecl -> PROC ID . LPAREN paramlist RPAREN vardecls pstmtlist
+
+    LPAREN          shift and go to state 36
+
+
+state 16
+
+    (5) vardecl -> VAR varlist SEMICOLON .
+
+    VAR             reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    PROC            reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    BEGIN           reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    DLABEL          reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    RETURN          reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    EXIT            reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    ID              reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    IF              reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    GOTO            reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    READ            reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    PRINT           reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    PRINTLN         reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+    CALL            reduce using rule 5 (vardecl -> VAR varlist SEMICOLON .)
+
+
+state 17
+
+    (6) varlist -> ID COMMA . varlist
+    (6) varlist -> . ID COMMA varlist
+    (7) varlist -> . ID
+
+    ID              shift and go to state 12
+
+    varlist                        shift and go to state 37
+
+state 18
+
+    (1) prog -> vardecls procdecls BEGIN stmtlist . END
+
+    END             shift and go to state 38
+
+
+state 19
+
+    (21) stmtlist -> mstmt . stmtlist
+    (22) stmtlist -> mstmt .
+    (21) stmtlist -> . mstmt stmtlist
+    (22) stmtlist -> . mstmt
+    (26) mstmt -> . DLABEL
+    (27) mstmt -> . stmt SEMICOLON
+    (28) stmt -> . assign
+    (29) stmt -> . condjump
+    (30) stmt -> . jump
+    (31) stmt -> . readstmt
+    (32) stmt -> . printstmt
+    (33) stmt -> . callstmt
+    (34) stmt -> . EXIT
+    (35) assign -> . ID EQUALS opd arithop opd
+    (36) condjump -> . IF ID cmpop ID GOTO LABEL
+    (37) jump -> . GOTO LABEL
+    (38) readstmt -> . READ ID
+    (39) printstmt -> . PRINT printarg
+    (40) printstmt -> . PRINTLN
+    (43) callstmt -> . CALL ID LPAREN arglist RPAREN
+
+    END             reduce using rule 22 (stmtlist -> mstmt .)
+    DLABEL          shift and go to state 20
+    EXIT            shift and go to state 28
+    ID              shift and go to state 29
+    IF              shift and go to state 30
+    GOTO            shift and go to state 31
+    READ            shift and go to state 32
+    PRINT           shift and go to state 33
+    PRINTLN         shift and go to state 34
+    CALL            shift and go to state 35
+
+    mstmt                          shift and go to state 19
+    stmtlist                       shift and go to state 39
+    stmt                           shift and go to state 21
+    assign                         shift and go to state 22
+    condjump                       shift and go to state 23
+    jump                           shift and go to state 24
+    readstmt                       shift and go to state 25
+    printstmt                      shift and go to state 26
+    callstmt                       shift and go to state 27
+
+state 20
+
+    (26) mstmt -> DLABEL .
+
+    DLABEL          reduce using rule 26 (mstmt -> DLABEL .)
+    EXIT            reduce using rule 26 (mstmt -> DLABEL .)
+    ID              reduce using rule 26 (mstmt -> DLABEL .)
+    IF              reduce using rule 26 (mstmt -> DLABEL .)
+    GOTO            reduce using rule 26 (mstmt -> DLABEL .)
+    READ            reduce using rule 26 (mstmt -> DLABEL .)
+    PRINT           reduce using rule 26 (mstmt -> DLABEL .)
+    PRINTLN         reduce using rule 26 (mstmt -> DLABEL .)
+    CALL            reduce using rule 26 (mstmt -> DLABEL .)
+    END             reduce using rule 26 (mstmt -> DLABEL .)
+
+
+state 21
+
+    (27) mstmt -> stmt . SEMICOLON
+
+    SEMICOLON       shift and go to state 40
+
+
+state 22
+
+    (28) stmt -> assign .
+
+    SEMICOLON       reduce using rule 28 (stmt -> assign .)
+
+
+state 23
+
+    (29) stmt -> condjump .
+
+    SEMICOLON       reduce using rule 29 (stmt -> condjump .)
+
+
+state 24
+
+    (30) stmt -> jump .
+
+    SEMICOLON       reduce using rule 30 (stmt -> jump .)
+
+
+state 25
+
+    (31) stmt -> readstmt .
+
+    SEMICOLON       reduce using rule 31 (stmt -> readstmt .)
+
+
+state 26
+
+    (32) stmt -> printstmt .
+
+    SEMICOLON       reduce using rule 32 (stmt -> printstmt .)
+
+
+state 27
+
+    (33) stmt -> callstmt .
+
+    SEMICOLON       reduce using rule 33 (stmt -> callstmt .)
+
+
+state 28
+
+    (34) stmt -> EXIT .
+
+    SEMICOLON       reduce using rule 34 (stmt -> EXIT .)
+
+
+state 29
+
+    (35) assign -> ID . EQUALS opd arithop opd
+
+    EQUALS          shift and go to state 41
+
+
+state 30
+
+    (36) condjump -> IF . ID cmpop ID GOTO LABEL
+
+    ID              shift and go to state 42
+
+
+state 31
+
+    (37) jump -> GOTO . LABEL
+
+    LABEL           shift and go to state 43
+
+
+state 32
+
+    (38) readstmt -> READ . ID
+
+    ID              shift and go to state 44
+
+
+state 33
+
+    (39) printstmt -> PRINT . printarg
+    (41) printarg -> . ID
+    (42) printarg -> . STRING
+
+    ID              shift and go to state 46
+    STRING          shift and go to state 47
+
+    printarg                       shift and go to state 45
+
+state 34
+
+    (40) printstmt -> PRINTLN .
+
+    SEMICOLON       reduce using rule 40 (printstmt -> PRINTLN .)
+
+
+state 35
+
+    (43) callstmt -> CALL . ID LPAREN arglist RPAREN
+
+    ID              shift and go to state 48
+
+
+state 36
+
+    (10) procdecl -> PROC ID LPAREN . paramlist RPAREN vardecls pstmtlist
+    (11) paramlist -> . tparamlist
+    (12) paramlist -> . empty
+    (13) tparamlist -> . param COMMA tparamlist
+    (14) tparamlist -> . param
+    (2) empty -> .
+    (15) param -> . mode ID
+    (16) mode -> . IN
+    (17) mode -> . OUT
+    (18) mode -> . INOUT
+
+    RPAREN          reduce using rule 2 (empty -> .)
+    IN              shift and go to state 54
+    OUT             shift and go to state 55
+    INOUT           shift and go to state 56
+
+    paramlist                      shift and go to state 49
+    tparamlist                     shift and go to state 50
+    empty                          shift and go to state 51
+    param                          shift and go to state 52
+    mode                           shift and go to state 53
+
+state 37
+
+    (6) varlist -> ID COMMA varlist .
+
+    SEMICOLON       reduce using rule 6 (varlist -> ID COMMA varlist .)
+
+
+state 38
+
+    (1) prog -> vardecls procdecls BEGIN stmtlist END .
+
+    $end            reduce using rule 1 (prog -> vardecls procdecls BEGIN stmtlist END .)
+
+
+state 39
+
+    (21) stmtlist -> mstmt stmtlist .
+
+    END             reduce using rule 21 (stmtlist -> mstmt stmtlist .)
+
+
+state 40
+
+    (27) mstmt -> stmt SEMICOLON .
+
+    DLABEL          reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    EXIT            reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    ID              reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    IF              reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    GOTO            reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    READ            reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    PRINT           reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    PRINTLN         reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    CALL            reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+    END             reduce using rule 27 (mstmt -> stmt SEMICOLON .)
+
+
+state 41
+
+    (35) assign -> ID EQUALS . opd arithop opd
+    (58) opd -> . ID
+    (59) opd -> . NUM
+
+    ID              shift and go to state 57
+    NUM             shift and go to state 59
+
+    opd                            shift and go to state 58
+
+state 42
+
+    (36) condjump -> IF ID . cmpop ID GOTO LABEL
+    (48) cmpop -> . LESSER
+    (49) cmpop -> . GREATER
+    (50) cmpop -> . LEQ
+    (51) cmpop -> . GEQ
+    (52) cmpop -> . EQUALS
+    (53) cmpop -> . NEQ
+
+    LESSER          shift and go to state 61
+    GREATER         shift and go to state 62
+    LEQ             shift and go to state 63
+    GEQ             shift and go to state 64
+    EQUALS          shift and go to state 65
+    NEQ             shift and go to state 66
+
+    cmpop                          shift and go to state 60
+
+state 43
+
+    (37) jump -> GOTO LABEL .
+
+    SEMICOLON       reduce using rule 37 (jump -> GOTO LABEL .)
+
+
+state 44
+
+    (38) readstmt -> READ ID .
+
+    SEMICOLON       reduce using rule 38 (readstmt -> READ ID .)
+
+
+state 45
+
+    (39) printstmt -> PRINT printarg .
+
+    SEMICOLON       reduce using rule 39 (printstmt -> PRINT printarg .)
+
+
+state 46
+
+    (41) printarg -> ID .
+
+    SEMICOLON       reduce using rule 41 (printarg -> ID .)
+
+
+state 47
+
+    (42) printarg -> STRING .
+
+    SEMICOLON       reduce using rule 42 (printarg -> STRING .)
+
+
+state 48
+
+    (43) callstmt -> CALL ID . LPAREN arglist RPAREN
+
+    LPAREN          shift and go to state 67
+
+
+state 49
+
+    (10) procdecl -> PROC ID LPAREN paramlist . RPAREN vardecls pstmtlist
+
+    RPAREN          shift and go to state 68
+
+
+state 50
+
+    (11) paramlist -> tparamlist .
+
+    RPAREN          reduce using rule 11 (paramlist -> tparamlist .)
+
+
+state 51
+
+    (12) paramlist -> empty .
+
+    RPAREN          reduce using rule 12 (paramlist -> empty .)
+
+
+state 52
+
+    (13) tparamlist -> param . COMMA tparamlist
+    (14) tparamlist -> param .
+
+    COMMA           shift and go to state 69
+    RPAREN          reduce using rule 14 (tparamlist -> param .)
+
+
+state 53
+
+    (15) param -> mode . ID
+
+    ID              shift and go to state 70
+
+
+state 54
+
+    (16) mode -> IN .
+
+    ID              reduce using rule 16 (mode -> IN .)
+
+
+state 55
+
+    (17) mode -> OUT .
+
+    ID              reduce using rule 17 (mode -> OUT .)
+
+
+state 56
+
+    (18) mode -> INOUT .
+
+    ID              reduce using rule 18 (mode -> INOUT .)
+
+
+state 57
+
+    (58) opd -> ID .
+
+    PLUS            reduce using rule 58 (opd -> ID .)
+    MINUS           reduce using rule 58 (opd -> ID .)
+    MULTIPLY        reduce using rule 58 (opd -> ID .)
+    DIVIDE          reduce using rule 58 (opd -> ID .)
+    SEMICOLON       reduce using rule 58 (opd -> ID .)
+
+
+state 58
+
+    (35) assign -> ID EQUALS opd . arithop opd
+    (54) arithop -> . PLUS
+    (55) arithop -> . MINUS
+    (56) arithop -> . MULTIPLY
+    (57) arithop -> . DIVIDE
+
+    PLUS            shift and go to state 72
+    MINUS           shift and go to state 73
+    MULTIPLY        shift and go to state 74
+    DIVIDE          shift and go to state 75
+
+    arithop                        shift and go to state 71
+
+state 59
+
+    (59) opd -> NUM .
+
+    PLUS            reduce using rule 59 (opd -> NUM .)
+    MINUS           reduce using rule 59 (opd -> NUM .)
+    MULTIPLY        reduce using rule 59 (opd -> NUM .)
+    DIVIDE          reduce using rule 59 (opd -> NUM .)
+    SEMICOLON       reduce using rule 59 (opd -> NUM .)
+
+
+state 60
+
+    (36) condjump -> IF ID cmpop . ID GOTO LABEL
+
+    ID              shift and go to state 76
+
+
+state 61
+
+    (48) cmpop -> LESSER .
+
+    ID              reduce using rule 48 (cmpop -> LESSER .)
+
+
+state 62
+
+    (49) cmpop -> GREATER .
+
+    ID              reduce using rule 49 (cmpop -> GREATER .)
+
+
+state 63
+
+    (50) cmpop -> LEQ .
+
+    ID              reduce using rule 50 (cmpop -> LEQ .)
+
+
+state 64
+
+    (51) cmpop -> GEQ .
+
+    ID              reduce using rule 51 (cmpop -> GEQ .)
+
+
+state 65
+
+    (52) cmpop -> EQUALS .
+
+    ID              reduce using rule 52 (cmpop -> EQUALS .)
+
+
+state 66
+
+    (53) cmpop -> NEQ .
+
+    ID              reduce using rule 53 (cmpop -> NEQ .)
+
+
+state 67
+
+    (43) callstmt -> CALL ID LPAREN . arglist RPAREN
+    (44) arglist -> . targlist
+    (45) arglist -> . empty
+    (46) targlist -> . ID COMMA targlist
+    (47) targlist -> . ID
+    (2) empty -> .
+
+    ID              shift and go to state 77
+    RPAREN          reduce using rule 2 (empty -> .)
+
+    arglist                        shift and go to state 78
+    targlist                       shift and go to state 79
+    empty                          shift and go to state 80
+
+state 68
+
+    (10) procdecl -> PROC ID LPAREN paramlist RPAREN . vardecls pstmtlist
+    (3) vardecls -> . vardecl vardecls
+    (4) vardecls -> . empty
+    (5) vardecl -> . VAR varlist SEMICOLON
+    (2) empty -> .
+
+    VAR             shift and go to state 5
+    DLABEL          reduce using rule 2 (empty -> .)
+    RETURN          reduce using rule 2 (empty -> .)
+    EXIT            reduce using rule 2 (empty -> .)
+    ID              reduce using rule 2 (empty -> .)
+    IF              reduce using rule 2 (empty -> .)
+    GOTO            reduce using rule 2 (empty -> .)
+    READ            reduce using rule 2 (empty -> .)
+    PRINT           reduce using rule 2 (empty -> .)
+    PRINTLN         reduce using rule 2 (empty -> .)
+    CALL            reduce using rule 2 (empty -> .)
+
+    vardecls                       shift and go to state 81
+    vardecl                        shift and go to state 3
+    empty                          shift and go to state 4
+
+state 69
+
+    (13) tparamlist -> param COMMA . tparamlist
+    (13) tparamlist -> . param COMMA tparamlist
+    (14) tparamlist -> . param
+    (15) param -> . mode ID
+    (16) mode -> . IN
+    (17) mode -> . OUT
+    (18) mode -> . INOUT
+
+    IN              shift and go to state 54
+    OUT             shift and go to state 55
+    INOUT           shift and go to state 56
+
+    param                          shift and go to state 52
+    tparamlist                     shift and go to state 82
+    mode                           shift and go to state 53
+
+state 70
+
+    (15) param -> mode ID .
+
+    COMMA           reduce using rule 15 (param -> mode ID .)
+    RPAREN          reduce using rule 15 (param -> mode ID .)
+
+
+state 71
+
+    (35) assign -> ID EQUALS opd arithop . opd
+    (58) opd -> . ID
+    (59) opd -> . NUM
+
+    ID              shift and go to state 57
+    NUM             shift and go to state 59
+
+    opd                            shift and go to state 83
+
+state 72
+
+    (54) arithop -> PLUS .
+
+    ID              reduce using rule 54 (arithop -> PLUS .)
+    NUM             reduce using rule 54 (arithop -> PLUS .)
+
+
+state 73
+
+    (55) arithop -> MINUS .
+
+    ID              reduce using rule 55 (arithop -> MINUS .)
+    NUM             reduce using rule 55 (arithop -> MINUS .)
+
+
+state 74
+
+    (56) arithop -> MULTIPLY .
+
+    ID              reduce using rule 56 (arithop -> MULTIPLY .)
+    NUM             reduce using rule 56 (arithop -> MULTIPLY .)
+
+
+state 75
+
+    (57) arithop -> DIVIDE .
+
+    ID              reduce using rule 57 (arithop -> DIVIDE .)
+    NUM             reduce using rule 57 (arithop -> DIVIDE .)
+
+
+state 76
+
+    (36) condjump -> IF ID cmpop ID . GOTO LABEL
+
+    GOTO            shift and go to state 84
+
+
+state 77
+
+    (46) targlist -> ID . COMMA targlist
+    (47) targlist -> ID .
+
+    COMMA           shift and go to state 85
+    RPAREN          reduce using rule 47 (targlist -> ID .)
+
+
+state 78
+
+    (43) callstmt -> CALL ID LPAREN arglist . RPAREN
+
+    RPAREN          shift and go to state 86
+
+
+state 79
+
+    (44) arglist -> targlist .
+
+    RPAREN          reduce using rule 44 (arglist -> targlist .)
+
+
+state 80
+
+    (45) arglist -> empty .
+
+    RPAREN          reduce using rule 45 (arglist -> empty .)
+
+
+state 81
+
+    (10) procdecl -> PROC ID LPAREN paramlist RPAREN vardecls . pstmtlist
+    (19) pstmtlist -> . pstmt pstmtlist
+    (20) pstmtlist -> . pstmt
+    (23) pstmt -> . DLABEL
+    (24) pstmt -> . stmt SEMICOLON
+    (25) pstmt -> . RETURN SEMICOLON
+    (28) stmt -> . assign
+    (29) stmt -> . condjump
+    (30) stmt -> . jump
+    (31) stmt -> . readstmt
+    (32) stmt -> . printstmt
+    (33) stmt -> . callstmt
+    (34) stmt -> . EXIT
+    (35) assign -> . ID EQUALS opd arithop opd
+    (36) condjump -> . IF ID cmpop ID GOTO LABEL
+    (37) jump -> . GOTO LABEL
+    (38) readstmt -> . READ ID
+    (39) printstmt -> . PRINT printarg
+    (40) printstmt -> . PRINTLN
+    (43) callstmt -> . CALL ID LPAREN arglist RPAREN
+
+    DLABEL          shift and go to state 89
+    RETURN          shift and go to state 91
+    EXIT            shift and go to state 28
+    ID              shift and go to state 29
+    IF              shift and go to state 30
+    GOTO            shift and go to state 31
+    READ            shift and go to state 32
+    PRINT           shift and go to state 33
+    PRINTLN         shift and go to state 34
+    CALL            shift and go to state 35
+
+    pstmtlist                      shift and go to state 87
+    pstmt                          shift and go to state 88
+    stmt                           shift and go to state 90
+    assign                         shift and go to state 22
+    condjump                       shift and go to state 23
+    jump                           shift and go to state 24
+    readstmt                       shift and go to state 25
+    printstmt                      shift and go to state 26
+    callstmt                       shift and go to state 27
+
+state 82
+
+    (13) tparamlist -> param COMMA tparamlist .
+
+    RPAREN          reduce using rule 13 (tparamlist -> param COMMA tparamlist .)
+
+
+state 83
+
+    (35) assign -> ID EQUALS opd arithop opd .
+
+    SEMICOLON       reduce using rule 35 (assign -> ID EQUALS opd arithop opd .)
+
+
+state 84
+
+    (36) condjump -> IF ID cmpop ID GOTO . LABEL
+
+    LABEL           shift and go to state 92
+
+
+state 85
+
+    (46) targlist -> ID COMMA . targlist
+    (46) targlist -> . ID COMMA targlist
+    (47) targlist -> . ID
+
+    ID              shift and go to state 77
+
+    targlist                       shift and go to state 93
+
+state 86
+
+    (43) callstmt -> CALL ID LPAREN arglist RPAREN .
+
+    SEMICOLON       reduce using rule 43 (callstmt -> CALL ID LPAREN arglist RPAREN .)
+
+
+state 87
+
+    (10) procdecl -> PROC ID LPAREN paramlist RPAREN vardecls pstmtlist .
+
+    PROC            reduce using rule 10 (procdecl -> PROC ID LPAREN paramlist RPAREN vardecls pstmtlist .)
+    BEGIN           reduce using rule 10 (procdecl -> PROC ID LPAREN paramlist RPAREN vardecls pstmtlist .)
+
+
+state 88
+
+    (19) pstmtlist -> pstmt . pstmtlist
+    (20) pstmtlist -> pstmt .
+    (19) pstmtlist -> . pstmt pstmtlist
+    (20) pstmtlist -> . pstmt
+    (23) pstmt -> . DLABEL
+    (24) pstmt -> . stmt SEMICOLON
+    (25) pstmt -> . RETURN SEMICOLON
+    (28) stmt -> . assign
+    (29) stmt -> . condjump
+    (30) stmt -> . jump
+    (31) stmt -> . readstmt
+    (32) stmt -> . printstmt
+    (33) stmt -> . callstmt
+    (34) stmt -> . EXIT
+    (35) assign -> . ID EQUALS opd arithop opd
+    (36) condjump -> . IF ID cmpop ID GOTO LABEL
+    (37) jump -> . GOTO LABEL
+    (38) readstmt -> . READ ID
+    (39) printstmt -> . PRINT printarg
+    (40) printstmt -> . PRINTLN
+    (43) callstmt -> . CALL ID LPAREN arglist RPAREN
+
+    PROC            reduce using rule 20 (pstmtlist -> pstmt .)
+    BEGIN           reduce using rule 20 (pstmtlist -> pstmt .)
+    DLABEL          shift and go to state 89
+    RETURN          shift and go to state 91
+    EXIT            shift and go to state 28
+    ID              shift and go to state 29
+    IF              shift and go to state 30
+    GOTO            shift and go to state 31
+    READ            shift and go to state 32
+    PRINT           shift and go to state 33
+    PRINTLN         shift and go to state 34
+    CALL            shift and go to state 35
+
+    pstmt                          shift and go to state 88
+    pstmtlist                      shift and go to state 94
+    stmt                           shift and go to state 90
+    assign                         shift and go to state 22
+    condjump                       shift and go to state 23
+    jump                           shift and go to state 24
+    readstmt                       shift and go to state 25
+    printstmt                      shift and go to state 26
+    callstmt                       shift and go to state 27
+
+state 89
+
+    (23) pstmt -> DLABEL .
+
+    DLABEL          reduce using rule 23 (pstmt -> DLABEL .)
+    RETURN          reduce using rule 23 (pstmt -> DLABEL .)
+    EXIT            reduce using rule 23 (pstmt -> DLABEL .)
+    ID              reduce using rule 23 (pstmt -> DLABEL .)
+    IF              reduce using rule 23 (pstmt -> DLABEL .)
+    GOTO            reduce using rule 23 (pstmt -> DLABEL .)
+    READ            reduce using rule 23 (pstmt -> DLABEL .)
+    PRINT           reduce using rule 23 (pstmt -> DLABEL .)
+    PRINTLN         reduce using rule 23 (pstmt -> DLABEL .)
+    CALL            reduce using rule 23 (pstmt -> DLABEL .)
+    PROC            reduce using rule 23 (pstmt -> DLABEL .)
+    BEGIN           reduce using rule 23 (pstmt -> DLABEL .)
+
+
+state 90
+
+    (24) pstmt -> stmt . SEMICOLON
+
+    SEMICOLON       shift and go to state 95
+
+
+state 91
+
+    (25) pstmt -> RETURN . SEMICOLON
+
+    SEMICOLON       shift and go to state 96
+
+
+state 92
+
+    (36) condjump -> IF ID cmpop ID GOTO LABEL .
+
+    SEMICOLON       reduce using rule 36 (condjump -> IF ID cmpop ID GOTO LABEL .)
+
+
+state 93
+
+    (46) targlist -> ID COMMA targlist .
+
+    RPAREN          reduce using rule 46 (targlist -> ID COMMA targlist .)
+
+
+state 94
+
+    (19) pstmtlist -> pstmt pstmtlist .
+
+    PROC            reduce using rule 19 (pstmtlist -> pstmt pstmtlist .)
+    BEGIN           reduce using rule 19 (pstmtlist -> pstmt pstmtlist .)
+
+
+state 95
+
+    (24) pstmt -> stmt SEMICOLON .
+
+    DLABEL          reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    RETURN          reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    EXIT            reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    ID              reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    IF              reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    GOTO            reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    READ            reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    PRINT           reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    PRINTLN         reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    CALL            reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    PROC            reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+    BEGIN           reduce using rule 24 (pstmt -> stmt SEMICOLON .)
+
+
+state 96
+
+    (25) pstmt -> RETURN SEMICOLON .
+
+    DLABEL          reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    RETURN          reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    EXIT            reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    ID              reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    IF              reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    GOTO            reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    READ            reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    PRINT           reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    PRINTLN         reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    CALL            reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    PROC            reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+    BEGIN           reduce using rule 25 (pstmt -> RETURN SEMICOLON .)
+
