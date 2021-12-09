@@ -96,7 +96,6 @@ t_NEQ       = r'\<\>'
 # ========== Regular expression rules with some action code ==========
 def t_STRING(t):
     r'\".*\"'
-    # r'"([^"\n]|(\\"))*"$'
     t.value = (t.value)[1:-1] # removing the double quotes
     return t
     
