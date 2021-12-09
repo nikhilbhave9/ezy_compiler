@@ -97,7 +97,7 @@ t_NEQ       = r'\<\>'
 def t_STRING(t):
     r'\".*\"'
     # r'"([^"\n]|(\\"))*"$'
-    # t.value = (t.value)[1:-1] # removing the double quotes
+    t.value = (t.value)[1:-1] # removing the double quotes
     return t
     
 def t_NUM(t):
@@ -149,36 +149,36 @@ def t_error(t):
 lexer = lex.lex()
 
 # Testing (you can use triple quotes as a string)
-# data = ''' var a,b;
-# var c;
-# % following procedure ensures that x<= y on return
-# proc order(inout x, inout y)
-# var t;
-# if x < y goto done;
-# t= x+0;
-# x = y+0;
-# y = t+0;
-# done:
-# return;
-# begin
-# print “enter two numbers “;
-# println;
-# read a ;
-# read b ;
-# call order(a,b);
-# %now a <= b
-# c=b/a ;
-# c = c*a ;
-# c = b – c ;
-# print “absolute mod is “ ;
-# print c;
-# println ;
-# exit ;
-# end
-# '''
+data = ''' var a,b;
+var c;
+% following procedure ensures that x<= y on return
+proc order(inout x, inout y)
+var t;
+if x < y goto done;
+t= x+0;
+x = y+0;
+y = t+0;
+done:
+return;
+begin
+print "enter two numbers ";
+println;
+read a ;
+read b ;
+call order(a,b);
+%now a <= b
+c=b/a ;
+c = c*a ;
+c = b - c ;
+print "absolute mod is " ;
+print c;
+println ;
+exit ;
+end
+'''
 
 
-data = "print “enter two numbers “;"
+# data = "print \"enter two numbers\";"
 def get_labels(data):
     for s in data:
         if(s[-1] == ':'):

@@ -35,3 +35,11 @@ MOV A,I
 ADI 6
 PUSH A
 PUSH $0
+---------------
+PRE-proc 
+list_labels: { asdf, asdf}
+def ID 
+filter reserved
+filter labels 
+def label: 
+[a-z]
