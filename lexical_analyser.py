@@ -176,14 +176,41 @@ exit ;
 end
 '''
 
+# data = '''begin
+# var a, b;
+# a = 3 + 3;
+# b = 4 + 1;
+# if a < b goto done;
+# hello:
+# print "hello: "
+# done:
+# return;
+# end
+# '''
+
 
 # data = "print \"enter two numbers\";"
 def get_labels(data):
+    ignore = False
     for s in data:
-        if(s[-1] == ':'):
-            labels.append(s[:-1])
+        if(s[0] == "\"" and ignore == False):
+            ignore = True
+            continue
+        elif(s[-1] == "\"" and ignore == True):
+            ignore = False
+            continue
+            
+        if(ignore):
+            continue
+        else:
+            if(s[-1] == ':'):
+                labels.append(s[:-1])
+        
+
 
 get_labels(data.split())
+
+print(labels)
 # Give the lexer some input
 lexer.input(data)
 
