@@ -3,6 +3,7 @@ from lexical_analyser import tokens
 from lexical_analyser import lexer
 import ply.lex as lex
 import ply.yacc as yacc
+from collections import deque
 import sys
 
 # Tokenize
@@ -12,14 +13,13 @@ import sys
 #         break      # No more input
 #     print(tok)     # Prints in the following format: TYPE OF TOKEN + VALUE + LINE NUMBER + LINE POSITION
 
-# class Node:
-#     def __init__(self,type,children=None,leaf=None):
-#          self.type = type
-#          if children:
-#               self.children = children
-#          else:
-#               self.children = [ ]
-#          self.leaf = leaf
+class Node:
+    def __init__(self,type,children=None):
+         self.type = type
+         if children:
+              self.children = children
+         else:
+              self.children = [ ]
 
 start = 'prog'
 
@@ -27,7 +27,7 @@ def p_prog(p):
     '''
     prog    : vardecls procdecls BEGIN stmtlist END
     '''
-    p[0] = ('prog', p[1], p[2], p[3], p[4], p[5])
+    p[0] = Node('prog', [p[1], p[2], p[3], p[4], p[5]])
 
 def p_empty(p):
     'empty  :'
@@ -39,18 +39,18 @@ def p_vardecls(p):
                 | empty
     '''
     if(len(p) == 3):
-        if(p[2][1] == None):
-            p[0] = ('vardecls', p[1])
+        if(p[2].children[0] == None):
+            p[0] = Node('vardecls', [p[1]])
         else:
-            p[0] = ('vardecls', p[1], p[2][1])
+            p[0] = Node('vardecls', [p[1], p[2].children[0]])
     else:
-        p[0] = ('vardecls', p[1])
+        p[0] = Node('vardecls', [p[1]])
 
 def p_vardecl(p):
     '''
     vardecl : VAR varlist SEMICOLON
     '''
-    p[0] = ('vardecl', p[2])
+    p[0] = Node('vardecl', [p[2]])
 
 def p_varlist(p):
     '''
@@ -58,9 +58,9 @@ def p_varlist(p):
             | ID
     '''
     if(len(p) > 2):
-        p[0] = ('varlist', p[1], p[3][1])
+        p[0] = Node('varlist', [p[1], p[3].children[0]])
     else:
-        p[0] = ('varlist', p[1])
+        p[0] = Node('varlist', [p[1]])
 
 def p_procdecls(p):
     '''
@@ -68,12 +68,12 @@ def p_procdecls(p):
                 | empty
     '''
     if(len(p) == 3):
-        if(p[2][1] == None):
-            p[0] = ('procdecls', p[1])
+        if(p[2].children[0] == None):
+            p[0] = Node('procdecls', [p[1]])
         else:
-            p[0] = ('procdecls', p[1], p[2][1])
+            p[0] = Node('procdecls', [p[1], p[2].children[0]])
     else:
-        p[0] = ('procdecls', p[1])
+        p[0] = Node('procdecls', [p[1]])
 
 # ======================Nikhil's Bit======================
 def p_procdel(p):
@@ -118,9 +118,9 @@ def p_stmtlist(p):
                 | mstmt
     '''
     if(len(p) > 2):
-        p[0] = ('stmtlist', p[1], p[2])
+        p[0] = Node('stmtlist', [p[1], p[2]])
     else:
-        p[0] = ('stmtlist', p[1])
+        p[0] = Node('stmtlist', [p[1]])
 
 def p_pstmt(p):
     '''
@@ -134,7 +134,7 @@ def p_mstmt(p):
     mstmt   : DLABEL
             | stmt SEMICOLON
     '''
-    p[0] = ('mstmt', p[1])
+    p[0] = Node('mstmt', [p[1]])
 
 def p_stmt(p):
     '''
@@ -146,7 +146,10 @@ def p_stmt(p):
             | callstmt
             | EXIT
     '''
-    p[0] = ('stmt', p[1])
+    if(p[1]):
+        p[0] = Node('stmt', [p[1]])
+
+    # p[0] = Node('stmt', [p[1]])
 
 def p_assign(p):
     '''
@@ -166,11 +169,13 @@ def p_jump(p):
     '''
     jump    : GOTO LABEL
     '''
+    p[0] = Node('jump', [p[1], p[2]])
 
 def p_readstmt(p):
     '''
     readstmt    : READ ID
     '''
+    p[0] = Node('readstmt', [p[1], p[2]])
 
 def p_printstmt(p):
     '''
@@ -178,33 +183,39 @@ def p_printstmt(p):
                 | PRINTLN
     '''
     if(len(p) == 3):
-        p[0] = ('printstmt',p[1], p[2])
+        p[0] = Node('printstmt',[p[1], p[2]])
     else:
-        p[0] = ('printstmt', p[1])
+        p[0] = Node('printstmt', [p[1]])
 
 def p_printarg(p):
     '''
     printarg    : ID
                 | STRING
     '''
-    p[0] = ('printarg', p[1])
+    p[0] = Node('printarg', [p[1]])
 
 def p_callstmt(p):
     '''
     callstmt    : CALL ID LPAREN arglist RPAREN
     '''
+    p[0] = Node('callstmt', [p[1], p[2], p[4]])
 
 def p_arglist(p):
     '''
     arglist : targlist
             | empty
     '''
+    p[0]  = Node('arglist', [p[1]])
 
 def p_targlist(p):
     '''
     targlist    : ID COMMA targlist
                 | ID
     '''
+    if(len(p) == 4):
+        p[0] = Node('targlist', [p[1], p[3].children[0]])
+    else:
+        p[0] = Node('targlist', [p[1]])
 
 def p_cmpop(p):
     '''
@@ -215,7 +226,7 @@ def p_cmpop(p):
             | EQUALS
             | NEQ
     '''
-
+    p[0] = Node('cmpop', [p[1]])
 def p_airthop(p):
     '''
     arithop : PLUS
@@ -223,12 +234,15 @@ def p_airthop(p):
             | MULTIPLY
             | DIVIDE
     '''
+    p[0] = Node('arithop', [p[1]])
+
 
 def p_opd(p):
     '''
     opd : ID
         | NUM
     '''
+    p[0] = Node('opd', [p[1]])
 # ======================End Nishant's Bit======================
 def p_error(p):
     print("Syntax error in input!")
@@ -270,7 +284,31 @@ print a;
 end
 '''
 res = parser.parse(data2, lexer)
-print(res)
+# print(res)
+
+ast = deque()
+
+ast.append(res)
+
+while(ast):
+    root = ast.popleft()
+    print(root.type, ': ', end = "")
+    for child in root.children:
+        if(not child):
+            print(None, end = " ")
+            # print(top.type, None)
+            continue
+        if(type(child) == str):
+            print(child, end=" ")
+            # print(top.type, child)
+        else:
+            print(child.type, end = " ")
+            # print(top.type, child.type)
+            ast.append(child)
+    # stack.reverse()
+    print()
+
+
 
 # while True:
 #     try:
@@ -281,4 +319,4 @@ print(res)
 #     result = parser.parse(s, lexer)
 #     print(result)
 
-('prog', ('vardecls', ('vardecl', ('varlist', 'a')), ('vardecls', None)), None, 'begin', ('stmtlist', ('mstmt', ('stmt', None)), ('stmtlist', ('mstmt', ('stmt', ('printstmt', 'print', ('printarg', 'a')))))), 'end')
+# ('prog', ('vardecls', ('vardecl', ('varlist', 'a')), ('vardecls', None)), None, 'begin', ('stmtlist', ('mstmt', ('stmt', None)), ('stmtlist', ('mstmt', ('stmt', ('printstmt', 'print', ('printarg', 'a')))))), 'end')
