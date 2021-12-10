@@ -27,7 +27,6 @@ def p_prog(p):
     '''
     prog    : vardecls procdecls BEGIN stmtlist END
     '''
-    print('debug', len(p[1]))
     p[0] = ('prog', p[1], p[2], p[3], p[4], p[5])
 
 def p_empty(p):
@@ -76,11 +75,12 @@ def p_procdecls(p):
     else:
         p[0] = ('procdecls', p[1])
 
+# ======================Nikhil's Bit======================
 def p_procdel(p):
     '''
     procdecl    : PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
     '''
-    
+
 
 def p_paramlist(p):
     '''
@@ -158,6 +158,10 @@ def p_condjump(p):
     condjump    : IF ID cmpop ID GOTO LABEL
     '''
 
+# ======================End Nikhil's Bit======================
+
+# # ======================Nishant's Bit======================
+
 def p_jump(p):
     '''
     jump    : GOTO LABEL
@@ -225,7 +229,7 @@ def p_opd(p):
     opd : ID
         | NUM
     '''
-
+# ======================End Nishant's Bit======================
 def p_error(p):
     print("Syntax error in input!")
 
