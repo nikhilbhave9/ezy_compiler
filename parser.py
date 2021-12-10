@@ -76,10 +76,20 @@ def p_procdecls(p):
         p[0] = Node('procdecls', [p[1]])
 
 # ======================Nikhil's Bit======================
-def p_procdel(p):
+def p_procdecl(p):
     '''
     procdecl    : PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
     '''
+    if (p[4][1] == None): # If param list is empty
+        if (p[6][1] == None): # If variable list is empty
+            p[0] = ('procdecl', p[2], p[7])
+        else:
+            p[0] = ('procdecl', p[2], p[6], p[7]) # (p[6][0]?)
+    else: # If param list is non-empty
+        if (p[6][1] == None): # If variable list is empty
+            p[0] = ('procdecl', p[2], p[4], p[7])
+        else: 
+            p[0] = ('procdecl', p[2], p[4], p[6], p[7])
 
 
 def p_paramlist(p):
@@ -87,17 +97,23 @@ def p_paramlist(p):
     paramlist   : tparamlist
                 | empty
     '''
+    p[0] = ('paramlist', p[1])
 
 def p_tparamlist(p):
     '''
     tparamlist  : param COMMA tparamlist
                 | param
     '''
+    if (len(p) == 4):
+        p[0] = ('tparamlist', p[0], p[3])
+    else:
+        p[0] = ('tparamlist', p[0])
 
 def p_param(p):
     '''
     param   : mode ID
     '''
+    p[0] = ('param', p[1], p[2])
 
 def p_mode(p):
     '''
@@ -105,22 +121,27 @@ def p_mode(p):
             | OUT
             | INOUT
     '''
+    p[0] = ('mode', p[1])
     
 def p_pstmtlist(p):
     '''
     pstmtlist   : pstmt pstmtlist
                 | pstmt
     '''
+    if (len(p) == 3):
+        p[0] = ('pstmtlist', p[1], p[2])
+    else:
+        p[0] = ('pstmtlist', p[1])
 
 def p_stmtlist(p):
     '''
     stmtlist    : mstmt stmtlist
                 | mstmt
     '''
-    if(len(p) > 2):
-        p[0] = Node('stmtlist', [p[1], p[2]])
+    if (len(p) > 2):
+        p[0] = ('stmtlist', p[1], p[2])
     else:
-        p[0] = Node('stmtlist', [p[1]])
+        p[0] = ('stmtlist', p[1])
 
 def p_pstmt(p):
     '''
@@ -128,13 +149,14 @@ def p_pstmt(p):
             | stmt SEMICOLON
             | RETURN SEMICOLON
     '''
+    p[0] = ('pstmt', p[1])
 
 def p_mstmt(p):
     '''
     mstmt   : DLABEL
             | stmt SEMICOLON
     '''
-    p[0] = Node('mstmt', [p[1]])
+    p[0] = ('mstmt', p[1])
 
 def p_stmt(p):
     '''
@@ -146,20 +168,19 @@ def p_stmt(p):
             | callstmt
             | EXIT
     '''
-    if(p[1]):
-        p[0] = Node('stmt', [p[1]])
-
-    # p[0] = Node('stmt', [p[1]])
+    p[0] = ('stmt', p[1])
 
 def p_assign(p):
     '''
     assign  : ID EQUALS opd arithop opd
     '''
+    p[0] = ('assign', p[1], p[3], p[4], p[5])
 
 def p_condjump(p):
     '''
     condjump    : IF ID cmpop ID GOTO LABEL
     '''
+    p[0] = ('condjump', p[2], p[3], p[4], p[6])
 
 # ======================End Nikhil's Bit======================
 
