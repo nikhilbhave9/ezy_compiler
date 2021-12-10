@@ -183,6 +183,8 @@ end
 # if a < b goto done;
 # hello:
 # print "hello: "
+# done: 
+# print"this is great";
 # done:
 # return;
 # end
@@ -204,17 +206,20 @@ def get_labels(data):
             continue
         else:
             if(s[-1] == ':'):
-                labels.append(s[:-1])
+                if(s[:-1] in labels):
+                    print(f"Error: redifinition of label '{s[:-1]}' ")
+                    exit(0)
+                else:
+                    labels.append(s[:-1])
         
 
 
 get_labels(data.split())
 
-print(labels)
 # Give the lexer some input
 lexer.input(data)
 
-# # Tokenize
+# Tokenize
 # while True:
 #     tok = lexer.token()
 #     if not tok:

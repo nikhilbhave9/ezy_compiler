@@ -13,6 +13,12 @@ import sys
 #         break      # No more input
 #     print(tok)     # Prints in the following format: TYPE OF TOKEN + VALUE + LINE NUMBER + LINE POSITION
 
+class Scope:
+    variables  = []
+    procedures = []
+    labels     = []
+
+
 class Node:
     def __init__(self,type,children=None):
          self.type = type
@@ -311,23 +317,26 @@ ast = deque()
 
 ast.append(res)
 
-while(ast):
-    root = ast.popleft()
-    print(root.type, ': ', end = "")
-    for child in root.children:
-        if(not child):
-            print(None, end = " ")
-            # print(top.type, None)
-            continue
-        if(type(child) != Node):
-            print(child, end=" ")
-            # print(top.type, child)
-        else:
-            print(child.type, end = " ")
-            # print(top.type, child.type)
-            ast.append(child)
-    # stack.reverse()
-    print()
+def generate_parse_tree(ast):
+    while(ast):
+        root = ast.popleft()
+        print(root.type, ': ', end = "")
+        for child in root.children:
+            if(not child):
+                print(None, end = " ")
+                # print(top.type, None)
+                continue
+            if(type(child) != Node):
+                print(child, end=" ")
+                # print(top.type, child)
+            else:
+                print(child.type, end = " ")
+                # print(top.type, child.type)
+                ast.append(child)
+        print()
+generate_parse_tree(ast)
+
+    
 
 
 
