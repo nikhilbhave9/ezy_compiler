@@ -80,16 +80,16 @@ def p_procdecl(p):
     '''
     procdecl    : PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
     '''
-    if (p[4][1] == None): # If param list is empty
-        if (p[6][1] == None): # If variable list is empty
-            p[0] = ('procdecl', p[2], p[7])
+    if (p[4].children[0] == None): # If param list is empty
+        if (p[6].children[0] == None): # If variable list is empty
+            p[0] = Node('procdecl', [p[2], p[7]])
         else:
-            p[0] = ('procdecl', p[2], p[6], p[7]) # (p[6][0]?)
+            p[0] = Node('procdecl', [p[2], p[6], p[7]]) # (p[6][0]?)
     else: # If param list is non-empty
-        if (p[6][1] == None): # If variable list is empty
-            p[0] = ('procdecl', p[2], p[4], p[7])
+        if (p[6].children[0] == None): # If variable list is empty
+            p[0] = Node('procdecl', [p[2], p[4], p[7]])
         else: 
-            p[0] = ('procdecl', p[2], p[4], p[6], p[7])
+            p[0] = Node('procdecl', [p[2], p[4], p[6], p[7]])
 
 
 def p_paramlist(p):
@@ -97,7 +97,7 @@ def p_paramlist(p):
     paramlist   : tparamlist
                 | empty
     '''
-    p[0] = ('paramlist', p[1])
+    p[0] = Node('paramlist', [p[1]])
 
 def p_tparamlist(p):
     '''
@@ -105,15 +105,15 @@ def p_tparamlist(p):
                 | param
     '''
     if (len(p) == 4):
-        p[0] = ('tparamlist', p[0], p[3])
+        p[0] = Node('tparamlist', [p[1], p[3]])
     else:
-        p[0] = ('tparamlist', p[0])
+        p[0] = Node('tparamlist', [p[1]])
 
 def p_param(p):
     '''
     param   : mode ID
     '''
-    p[0] = ('param', p[1], p[2])
+    p[0] = Node('param', [p[1], p[2]])
 
 def p_mode(p):
     '''
@@ -121,7 +121,7 @@ def p_mode(p):
             | OUT
             | INOUT
     '''
-    p[0] = ('mode', p[1])
+    p[0] = Node('mode', [p[1]])
     
 def p_pstmtlist(p):
     '''
@@ -129,9 +129,9 @@ def p_pstmtlist(p):
                 | pstmt
     '''
     if (len(p) == 3):
-        p[0] = ('pstmtlist', p[1], p[2])
+        p[0] = Node('pstmtlist', [p[1], p[2]])
     else:
-        p[0] = ('pstmtlist', p[1])
+        p[0] = Node('pstmtlist', [p[1]])
 
 def p_stmtlist(p):
     '''
@@ -139,9 +139,9 @@ def p_stmtlist(p):
                 | mstmt
     '''
     if (len(p) > 2):
-        p[0] = ('stmtlist', p[1], p[2])
+        p[0] = Node('stmtlist', [p[1], p[2]])
     else:
-        p[0] = ('stmtlist', p[1])
+        p[0] = Node('stmtlist', [p[1]])
 
 def p_pstmt(p):
     '''
@@ -149,14 +149,14 @@ def p_pstmt(p):
             | stmt SEMICOLON
             | RETURN SEMICOLON
     '''
-    p[0] = ('pstmt', p[1])
+    p[0] = Node('pstmt', [p[1]])
 
 def p_mstmt(p):
     '''
     mstmt   : DLABEL
             | stmt SEMICOLON
     '''
-    p[0] = ('mstmt', p[1])
+    p[0] = Node('mstmt', [p[1]])
 
 def p_stmt(p):
     '''
@@ -168,19 +168,19 @@ def p_stmt(p):
             | callstmt
             | EXIT
     '''
-    p[0] = ('stmt', p[1])
+    p[0] = Node('stmt', [p[1]])
 
 def p_assign(p):
     '''
     assign  : ID EQUALS opd arithop opd
     '''
-    p[0] = ('assign', p[1], p[3], p[4], p[5])
+    p[0] = Node('assign', [p[1], p[3], p[4], p[5]])
 
 def p_condjump(p):
     '''
     condjump    : IF ID cmpop ID GOTO LABEL
     '''
-    p[0] = ('condjump', p[2], p[3], p[4], p[6])
+    p[0] = Node('condjump', [p[2], p[3], p[4], p[6]])
 
 # ======================End Nikhil's Bit======================
 
@@ -304,7 +304,7 @@ a = 3 + 3;
 print a;
 end
 '''
-res = parser.parse(data2, lexer)
+res = parser.parse(data, lexer)
 # print(res)
 
 ast = deque()
@@ -319,7 +319,7 @@ while(ast):
             print(None, end = " ")
             # print(top.type, None)
             continue
-        if(type(child) == str):
+        if(type(child) != Node):
             print(child, end=" ")
             # print(top.type, child)
         else:
