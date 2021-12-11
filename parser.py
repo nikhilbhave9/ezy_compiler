@@ -1,22 +1,32 @@
 import lexical_analyser
 from lexical_analyser import tokens
 from lexical_analyser import lexer
+from lexical_analyser import procList
+from lexical_analyser import symbolTableClass
 import ply.lex as lex
 import ply.yacc as yacc
 from collections import deque
 import sys
 
-# Tokenize
-# while True:
-#     tok = lexer.token()
-#     if not tok:
-#         break      # No more input
-#     print(tok)     # Prints in the following format: TYPE OF TOKEN + VALUE + LINE NUMBER + LINE POSITION
+# Code for dynamically creating new classes 
+class BaseClass(object):
+    def __init__(self, classtype):
+        self._type = classtype
 
-class Scope:
-    variables  = []
-    procedures = []
-    labels     = []
+def ClassFactory(name, argnames, BaseClass=BaseClass):
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            # here, the argnames variable is the one passed to the
+            # ClassFactory call
+            if key not in argnames:
+                raise TypeError("Argument %s not valid for %s" 
+                    % (key, self.__class__.__name__))
+            setattr(self, key, value)
+        BaseClass.__init__(self, name[:-len("Class")])
+    newclass = type(name, (BaseClass,),{"__init__": __init__})
+    return newclass
+
+
 
 
 class Node:
@@ -340,13 +350,3 @@ generate_parse_tree(ast)
 
 
 
-# while True:
-#     try:
-#        s = input()
-#     except EOFError:
-#        break
-#     if not s: continue
-#     result = parser.parse(s, lexer)
-#     print(result)
-
-# ('prog', ('vardecls', ('vardecl', ('varlist', 'a')), ('vardecls', None)), None, 'begin', ('stmtlist', ('mstmt', ('stmt', None)), ('stmtlist', ('mstmt', ('stmt', ('printstmt', 'print', ('printarg', 'a')))))), 'end')
