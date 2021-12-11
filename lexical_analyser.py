@@ -22,7 +22,7 @@ reserved = {
 
 labels = []
 
-procs = []
+procs = ['global']
 
 # tokens = ['NUMBER', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'COMP', 'EQUALS', 'LPAREN', 'RPAREN', 'ID', 'LABEL', 'COMMENT', 'DLABEL'] + list(reserved.values())
 
@@ -149,46 +149,46 @@ def t_error(t):
 lexer = lex.lex()
 
 # Testing (you can use triple quotes as a string)
-# data = ''' var a,b;
-# var c;
-# % following procedure ensures that x<= y on return
-# proc order(inout x, inout y)
-# var t;
-# if x < y goto done;
-# t= x+0;
-# x = y+0;
-# y = t+0;
-# done:
-# return;
-# begin
-# print "enter two numbers ";
-# println;
-# read a ;
-# read b ;
-# call order(a,b);
-# %now a <= b
-# c=b/a ;
-# c = c*a ;
-# c = b - c ;
-# print "absolute mod is " ;
-# print c;
-# println ;
-# exit ;
-# end
-# '''
-data = '''proc order(inout x, inout y)
+data = ''' var a,b;
+var c;
+% following procedure ensures that x<= y on return
+proc order(inout x, inout y)
 var t;
-t=0+1;
-return;
-proc order2(inout x, inout y)
-var a, b;
-a=0+1;
-b = 3+2;
+if x < y goto done;
+t= x+0;
+x = y+0;
+y = t+0;
+done:
 return;
 begin
-print"hi";
+print "enter two numbers ";
+println;
+read a ;
+read b ;
+call order(a,b);
+%now a <= b
+c=b/a ;
+c = c*a ;
+c = b - c ;
+print "absolute mod is " ;
+print c;
+println ;
+exit ;
 end
 '''
+# data = '''proc order(inout x, inout y)
+# var t;
+# t=0+1;
+# return;
+# proc order2(inout x, inout y)
+# var a, b;
+# a=0+1;
+# b = 3+2;
+# return;
+# begin
+# print"hi";
+# end
+# '''
 
 # ======================= End of Data ======================= 
 
@@ -250,12 +250,15 @@ def get_procs(data):
 
 
 # Initialize Symbol Table dictionary 
-sy_dict = {key: None for key in procs}
+
 
 get_labels(data.split())
 get_procs(data.split())
 
-print(procs)
+sy_dict = {key: [] for key in procs}
+var_dict = {key: [] for key in procs}
+label_dict = {key: [] for key in procs}
+
 
 # Give the lexer some input
 lexer.input(data)

@@ -11,6 +11,7 @@ import ply.yacc as yacc
 from collections import deque
 import sys
 
+
 # Code for dynamically creating new classes 
 class BaseClass(object):
     def __init__(self, classtype):
@@ -36,11 +37,8 @@ class Node:
          else:
               self.children = [ ]
 
-curScope = 'global'
 
 start = 'prog'
-
-
 
 curLabels = []
 curVars = []
@@ -49,8 +47,19 @@ def p_prog(p):
     '''
     prog    : vardecls procdecls BEGIN stmtlist END
     '''
-    global curScope
     global curVars
+    global curLabels
+
+    # var_dict['global'] = curVars
+    # label_dict['global'] = curLabels
+    # curVars = []
+    # curLabels = []
+
+    if(p[1].children[0] != None):
+        for vd in p[1].children:
+            for vl in vd.children:
+                for variable in vl.children:
+                    var_dict['global'].append(variable)
     p[0] = Node('prog', [p[1], p[2], p[3], p[4], p[5]])
 
 def p_empty(p):
@@ -63,7 +72,6 @@ def p_vardecls(p):
                 | empty
     '''
 
-    global curScope
     if(len(p) == 3):
         if(p[2].children[0] == None):
             p[0] = Node('vardecls', [p[1]])
@@ -77,7 +85,6 @@ def p_vardecl(p):
     vardecl : VAR varlist SEMICOLON
     '''
 
-    global curScope
     p[0] = Node('vardecl', [p[2]])
 
 def p_varlist(p):
@@ -86,7 +93,6 @@ def p_varlist(p):
             | ID
     '''
 
-    global curScope
     global curVars
     curVars.append(p[1])
     
@@ -100,7 +106,6 @@ def p_procdecls(p):
     procdecls   : procdecl procdecls
                 | empty
     '''
-    global curScope
     if(len(p) == 3):
         if(p[2].children[0] == None):
             p[0] = Node('procdecls', [p[1]])
@@ -114,21 +119,20 @@ def p_procdecl(p):
     '''
     procdecl    : PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
     '''
-    global curScope
     global curVars
     global curLabels
 
-    sy_dict[p[2]] = ClassGenerator(p[2], "variables labels".split())
-    var_dict[p[2]] = curVars
-    label_dict[p[2]] = curLabels
+    # var_dict[p[2]] = curVars
+    # label_dict[p[2]] = curLabels
+
+    if(p[6].children[0] != None):
+        for vd in p[6].children:
+            for vl in vd.children:
+                for variable in vl.children:
+                    var_dict[p[2]].append(variable)
 
     curVars = []
     curLabels = []
-    assert(curScope == 'global')
-
-    curScope = p[2]
-
-    
 
     if (p[4].children[0] == None): # If param list is empty
         if (p[6].children[0] == None): # If variable list is empty
@@ -147,11 +151,8 @@ def p_paramlist(p):
     paramlist   : tparamlist
                 | empty
     '''
-    global curScope
-
     
 
-    # assert(curScope != 'global')
     p[0] = Node('paramlist', [p[1]])
 
 def p_tparamlist(p):
@@ -159,8 +160,6 @@ def p_tparamlist(p):
     tparamlist  : param COMMA tparamlist
                 | param
     '''
-    global curScope
-    # assert(curScope != 'global')
 
     if (len(p) == 4):
         p[0] = Node('tparamlist', [p[1], p[3]])
@@ -172,12 +171,10 @@ def p_param(p):
     '''
     param   : mode ID
     '''
-    global curScope
-    # assert(curScope != 'global')
-
 
     p[0] = Node('param', [p[1], p[2]])
-    # sy_dict[curScope].variables.append(p[2])
+    
+    curVars.append(p[2])
 
 def p_mode(p):
     '''
@@ -185,9 +182,6 @@ def p_mode(p):
             | OUT
             | INOUT
     '''
-    global curScope
-    # assert(curScope != 'global')
-
     p[0] = Node('mode', [p[1]])
     
 def p_pstmtlist(p):
@@ -195,8 +189,6 @@ def p_pstmtlist(p):
     pstmtlist   : pstmt pstmtlist
                 | pstmt
     '''
-    global curScope
-    # assert(curScope != 'global')
 
     if (len(p) == 3):
         p[0] = Node('pstmtlist', [p[1], p[2]])
@@ -208,7 +200,6 @@ def p_stmtlist(p):
     stmtlist    : mstmt stmtlist
                 | mstmt
     '''
-    global curScope
 
     if (len(p) > 2):
         p[0] = Node('stmtlist', [p[1], p[2]])
@@ -221,14 +212,10 @@ def p_pstmt(p):
             | stmt SEMICOLON
             | RETURN SEMICOLON
     '''
-    global curScope
-    # assert(curScope != 'global')
 
-    if(p[1] in labels):
-        sy_dict[curScope].labels.append(p[1])
-    elif(p[1] == 'return'):
-        curScope = 'global'
     p[0] = Node('pstmt', [p[1]])
+    if(p[1] in labels):
+        curLabels.append(p[1])
 
 def p_mstmt(p):
     '''
@@ -237,6 +224,8 @@ def p_mstmt(p):
     '''
 
     p[0] = Node('mstmt', [p[1]])
+    if(p[1] in labels):
+        curLabels.append(p[1])
 
 def p_stmt(p):
     '''
@@ -262,6 +251,9 @@ def p_condjump(p):
     condjump    : IF ID cmpop ID GOTO LABEL
     '''
     p[0] = Node('condjump', [p[2], p[3], p[4], p[6]])
+    if(p[6] not in labels):
+        print(f"Error! label '{p[6]}' has not been defined")
+        exit(0)
 
 # ======================End Nikhil's Bit======================
 
@@ -272,6 +264,9 @@ def p_jump(p):
     jump    : GOTO LABEL
     '''
     p[0] = Node('jump', [p[1], p[2]])
+    if(p[2] not in labels):
+        print(f"Error! label '{p[2]}' has not been defined")
+        exit(0)
 
 def p_readstmt(p):
     '''
@@ -351,48 +346,48 @@ def p_error(p):
 
 parser = yacc.yacc(debug=True)
 
-# data = ''' var a,b;
-# var c;
-# % following procedure ensures that x<= y on return
-# proc order(inout x, inout y)
-# var t;
-# if x < y goto done;
-# t= x+0;
-# x = y+0;
-# y = t+0;
-# done:
-# return;
-# begin
-# print "enter two numbers ";
-# println;
-# read a ;
-# read b ;
-# call order(a,b);
-# %now a <= b
-# c=b/a ;
-# c = c*a ;
-# c = b - c ;
-# print "absolute mod is " ;
-# print c;
-# println ;
-# exit ;
-# end
-# '''
-
-data2 = '''proc order(inout x, inout y)
+data = ''' var a,b;
+var c;
+% following procedure ensures that x<= y on return
+proc order(inout x, inout y)
 var t;
-t=0+1;
-return;
-proc order2(inout x, inout y)
-var a, b;
-a=0+1;
-b = 3+2;
+if x < y goto done;
+t= x+0;
+x = y+0;
+y = t+0;
+done:
 return;
 begin
-print"hi";
+print "enter two numbers ";
+println;
+read a ;
+read b ;
+call order(a,b);
+%now a <= b
+c=b/a ;
+c = c*a ;
+c = b - c ;
+print "absolute mod is " ;
+print c;
+println ;
+exit ;
 end
 '''
-res = parser.parse(data2, lexer)
+
+# data2 = '''proc order(inout x, inout y)
+# var t;
+# t=0+1;
+# return;
+# proc order2(inout x, inout y)
+# var a, b;
+# a=0+1;
+# b = 3+2;
+# return;
+# begin
+# print"hi";
+# end
+# '''
+res = parser.parse(data, lexer)
 # print(res)
 
 ast = deque()
@@ -418,7 +413,8 @@ def generate_parse_tree(ast):
         print()
 # generate_parse_tree(ast)
 
+for key in var_dict:
+    print(key, var_dict[key])
     
-
 
 
