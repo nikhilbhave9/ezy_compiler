@@ -2,7 +2,6 @@ import ply.lex as lex   #  Lex = Lexer-generator
 import ply.yacc as yacc # Yacc = Parser-generator
 import sys
 
-
 reserved = {
     'begin'     : 'BEGIN',
     'end'       : 'END',
@@ -22,6 +21,8 @@ reserved = {
 }
 
 labels = []
+
+procs = []
 
 # tokens = ['NUMBER', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'COMP', 'EQUALS', 'LPAREN', 'RPAREN', 'ID', 'LABEL', 'COMMENT', 'DLABEL'] + list(reserved.values())
 
@@ -152,6 +153,7 @@ data = ''' var a,b;
 var c;
 % following procedure ensures that x<= y on return
 proc order(inout x, inout y)
+proc order(inout p, inout q)
 var t;
 if x < y goto done;
 t= x+0;
@@ -190,6 +192,11 @@ end
 # end
 # '''
 
+# ======================= End of Data ======================= 
+
+# ==========================================
+# Pre-processing before lexer is fed data
+# ==========================================
 
 # data = "print \"enter two numbers\";"
 def get_labels(data):
@@ -211,10 +218,44 @@ def get_labels(data):
                     exit(0)
                 else:
                     labels.append(s[:-1])
-        
 
+
+def get_procs(data):
+    ignore = False 
+    isProc = False
+    for s in data:
+        if(s[0] == "\"" and ignore == False):
+            ignore = True
+            continue
+        elif(s[-1] == "\"" and ignore == True):
+            ignore = False
+            continue
+        
+        if(ignore):
+            continue
+        else:
+            if s == 'proc':
+                isProc = True;
+            else:
+                if isProc == True: 
+                    s_partition = s.partition("(")
+                    proc_string = s_partition[0]
+
+                    # Semantic Check for duplicate procedures
+                    if proc_string in procs:
+                        print("ERROR: Duplicate Procedure")
+                        isProc = False
+                    else:
+                        procs.append(proc_string)
+                        isProc = False
+
+
+
+# Initialize Symbol Table dictionary 
+sy_dict = {key: None for key in procs}
 
 get_labels(data.split())
+get_procs(data.split())
 
 # Give the lexer some input
 lexer.input(data)
