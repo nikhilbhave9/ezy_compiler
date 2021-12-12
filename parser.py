@@ -5,6 +5,26 @@ import ply.yacc as yacc
 from collections import deque
 import sys
 
+'''
+Summary of what parser.py does:
+    1. Defines a class Node, which will be used to represent each node of the parse tree generated
+    2. Builds a parser using the CFG rules given and using yacc.py
+    3. Populates var_dict{}, mapping each procedure scope (and 'global' scope) to list of variables declared in the scope
+    4. Populates label_dict{}, mapping each procedure scope (and 'global' scope) to list of labels declared in the scope
+    5. Populates param_dict{}, mapping each procedure scope to list of parameters defined in the procedure
+    6. Has functionality to display the parse tree (for more details, refer to the display_parse_tree() function defined below)
+
+Semantic checks performed by parser.py":
+    - Semantic Check 1: Number of arguments in a call should match with number of parameters in called procedure
+    - Semantic Check 3: The in parameter will be pass by value, out by pass by result and inout will be pass by value-result
+    - Semantic Check 4: Variables declared in the beginning are global and accessible every where
+    - Semantic Check 5: Variables not declared inside a function but referred must be declared as global
+    - Semantic Check 6: No variable can have same name as a procedure and vice versa
+    - Semantic Check 7: No two variables in same scope can have same name
+    - Semantic Check 9: Labels referred must be defined somewhere. If referred in a procedure then must be defined
+                        within procedure and if referred in main program then must be defined in main program
+'''
+
 
 #----------------------------------------------------------------------------------------------
 #======================= Defining Structure for Each Node in Parse Tree =======================
@@ -32,6 +52,9 @@ def p_prog(p):
         for vd in p[1].children:    # iterating through each vardecl
             for vl in vd.children:  # iterating through each varlist of each vardecl
                 for variable in vl.children:    # iterating through each variable in the varlist and adding it to var_dict['global]
+                    if(variable in var_dict['global']):
+                        print(f"Error: Semantic Check 7 failed -- redefinition of var {variable} in global scope")
+                        exit(0)
                     var_dict['global'].append(variable)
     p[0] = Node('prog', [p[1], p[2], p[3], p[4], p[5]])
 
@@ -98,6 +121,9 @@ def p_procdecl(p):
         for vd in p[6].children:    # iterating through each vardecl
             for vl in vd.children:  # iterating through each varlist in each vardecl
                 for variable in vl.children:    # iterating through each variable name in the varlist
+                    if(variable in var_dict[p[2]]):
+                        print(f"Error: Semantic Check 7 failed -- redefinition of var {variable} in proc '{p[2]}'")
+                        exit(0)
                     var_dict[p[2]].append(variable) 
 
 
@@ -337,9 +363,9 @@ def semantic_check1(lexer, ezy_input):
     while True:
         tok = lexer.token()
         if not tok:
-            print("Semantic check 3 OK")
-            print("Semantic check 4 OK")
-            print("Semantic check 5 OK")
+            print("Semantic Check 3  OK")
+            print("Semantic Check 4  OK")
+            print("Semantic Check 5  OK")
             break      # No more input
         if(tok.value == 'proc'):
             assert(inProc == False)
@@ -405,7 +431,7 @@ def display_parse_tree(result):
     print()
 
 # uncomment the below function call to see the parse tree printed
-# display_parse_tree(result)
+display_parse_tree(result)
     
 
     

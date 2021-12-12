@@ -14,8 +14,8 @@ Summary of what lexical_analyser.py does:
         b. A list of names of all procedures defined in the program, along with the number of parameters in the function
 
 Semantic checks performed by lexical_analyser.py:
-    1. Semantic Check 8 : No two procedures can have same name
-    2. Semantic Check 10: No label can be defined more than once. In particular, same label can not be used in main
+    - Semantic Check 8 : No two procedures can have same name
+    - Semantic Check 10: No label can be defined more than once. In particular, same label can not be used in main
 program and inside a procedure.
 '''
 
@@ -159,7 +159,7 @@ def get_procs(data):
                         stringBuf = ""                
 
 
-    print("Semantic check 8 OK")                
+    print("Semantic Check 8  OK")                
 
 
 
@@ -244,16 +244,24 @@ lexer = lex.lex() # building the lexer
 lexer.input(ezy_input) # feeding our ezy program into the lexer
 
 def tokenize(lexer):
+    print()
+    print("---------------------------------------------------------------------")
+    print("================ Begin Tokenised Output (Type, Lexeme) ==============")
+    print("---------------------------------------------------------------------")
+    ctr = 1
     while True:
         tok = lexer.token()
         if not tok:
+            print("---------------------------------------------------------------------")
+            print()
+            print()
             break      # No more input
-        print(tok)     # Prints in the following format: TYPE OF TOKEN + VALUE + LINE NUMBER + LINE POSITION
 
-
+        print(f'{ctr}. ({tok.type}, \'{tok.value}\')')
+        ctr += 1
 
 # uncomment below function call to see the tokenisation take place
-# tokenize(lexer) 
+tokenize(lexer) 
 
 
 
