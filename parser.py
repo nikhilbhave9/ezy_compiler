@@ -391,6 +391,20 @@ def semantic_check1(lexer, ezy_input):
 
 semantic_check1(lexer, ezy_input)
 
+def idenVarProcs():
+    values = var_dict.values()
+    for proc in procs:
+        for value_tuple in values: 
+            for value in value_tuple:
+                if proc[0] == value:
+                    print("Error: Semantic Check 6 failed -- Proc: " + proc[0] + " and Variable: " + value + " have the same name")
+                    exit(0)
+
+
+idenVarProcs()
+
+# If all OK
+print("All semantic checks passed")
 
 #----------------------------------------------------------------------------------------------
 #================================= Generating the Parse Tree ==================================
