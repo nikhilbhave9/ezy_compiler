@@ -2,7 +2,6 @@ import lexical_analyser
 from lexical_analyser import tokens
 from lexical_analyser import lexer
 from lexical_analyser import procs
-from lexical_analyser import sy_dict
 from lexical_analyser import var_dict
 from lexical_analyser import label_dict
 from lexical_analyser import labels
