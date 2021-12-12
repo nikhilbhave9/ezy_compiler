@@ -5,7 +5,10 @@ import sys
 '''
 Summary of what lexical_analyser.py does:
     1. Determines the input of the compiler (i.e), the ezy program to be compiled (see ezy_input)
+       Note: To see the result of the tokenisation, call tokenise() function defined towards the end of file
+
     2. Defines a list of tokens using the grammar provided, and performs tokenisation using lex.py
+
     3. Does some pre-processing of the input ezy program to obtain:-
         a. A list of all labels defined in the program
         b. A list of names of all procedures defined in the program, along with the number of parameters in the function
