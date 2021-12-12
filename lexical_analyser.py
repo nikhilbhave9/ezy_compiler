@@ -107,9 +107,47 @@ def get_labels(data):
 
 
 # function that goes through the ezy input program and updates the list of procedure names
+# def get_procs(data):
+#     inPrintStmt = False # flag that tells if current word in ezy input is within a print statement
+#     isProc = False      # flag that tells if current word in ezy input is within a proc's definition
+#     for s in data:
+
+#         # checking if we're within a print statement
+#         if(s[0] == "\"" and inPrintStmt == False):
+#             inPrintStmt = True
+#             continue
+#         elif(s[-1] == "\"" and inPrintStmt == True):
+#             inPrintStmt = False
+#             continue
+        
+#         if(inPrintStmt):
+#             continue
+
+#         # if we're not within a print statement
+#         else:
+#             if s == 'proc':
+#                 isProc = True
+#             else:
+#                 if isProc == True: 
+#                     s_partition = s.partition("(")
+#                     proc_string = s_partition[0]
+
+#                     # semantic Check for duplicate procedures
+#                     # Note: we assume that function overloading is not supported by ezy. This means that
+#                     # regardless of the number and type of parameters, no 2 procedures can have the same name.
+#                     if proc_string in procs:
+#                         print(f"Error: redefinition of procedure '{proc_string}'")
+#                         isProc = False
+#                     else:
+#                         procs.append(proc_string) # updating the list of procedure names
+#                         isProc = False
+
+# function that goes through the ezy input program and updates the list of procedure names
 def get_procs(data):
     inPrintStmt = False # flag that tells if current word in ezy input is within a print statement
     isProc = False      # flag that tells if current word in ezy input is within a proc's definition
+    procAdded = False   # flag that tells if the proc name has been added to the proc list but we're still within the function declaration
+    stringBuf = ""
     for s in data:
 
         # checking if we're within a print statement
@@ -129,18 +167,32 @@ def get_procs(data):
                 isProc = True
             else:
                 if isProc == True: 
-                    s_partition = s.partition("(")
-                    proc_string = s_partition[0]
+                    # s_partition = s.partition("(")
+                    # proc_string = s_partition[0]
+                    stringBuf += s
+                    if s[-1] == ')':
+                        isProc = False
+                        procs.append([stringBuf.split('(')[0], len(stringBuf.split(','))])
+                        stringBuf = ""                
+
+                        
+
+
+
 
                     # semantic Check for duplicate procedures
                     # Note: we assume that function overloading is not supported by ezy. This means that
                     # regardless of the number and type of parameters, no 2 procedures can have the same name.
-                    if proc_string in procs:
-                        print(f"Error: redefinition of procedure '{proc_string}'")
-                        isProc = False
-                    else:
-                        procs.append(proc_string) # updating the list of procedure names
-                        isProc = False
+                    # if proc_string in procs:
+                    #     print(f"Error: redefinition of procedure '{proc_string}'")
+                    #     isProc = False
+                    # else:
+                    #     newproc = proc_string
+                    #     numParam = 10 #  Placeholder
+                    #     types = ()
+                    #     procs.append((newproc, numParam, types))) # updating the list of procedure names
+                    #     isProc = False
+
 
 
 get_labels(ezy_input.split())   # updating the labels list
