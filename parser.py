@@ -1,33 +1,16 @@
 import lexical_analyser
-from lexical_analyser import tokens
-from lexical_analyser import lexer
-from lexical_analyser import procs
-from lexical_analyser import sy_dict
-from lexical_analyser import var_dict
-from lexical_analyser import label_dict
-from lexical_analyser import labels
-from lexical_analyser import ezy_input
+from lexical_analyser import *
+# from lexical_analyser import tokens
+# from lexical_analyser import lexer
+# from lexical_analyser import procs
+# from lexical_analyser import var_dict
+# from lexical_analyser import label_dict
+# from lexical_analyser import labels
+# from lexical_analyser import ezy_input
 import ply.lex as lex
 import ply.yacc as yacc
 from collections import deque
 import sys
-
-
-# Code for dynamically creating new classes 
-class BaseClass(object):
-    def __init__(self, classtype):
-        self._type = classtype
-
-def ClassGenerator(name, argnames, BaseClass=BaseClass):
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            if key not in argnames:
-                raise TypeError("Argument %s not valid for %s" 
-                    % (key, self.__class__.__name__))
-            setattr(self, key, value)
-        BaseClass.__init__(self, name[:-len("Class")])
-    newclass = type(name, (BaseClass,),{"__init__": __init__})
-    return newclass
 
 
 class Node:
@@ -38,23 +21,12 @@ class Node:
          else:
               self.children = [ ]
 
-
 start = 'prog'
-
-curLabels = []
-curVars = []
 
 def p_prog(p):
     '''
     prog    : vardecls procdecls BEGIN stmtlist END
     '''
-    global curVars
-    global curLabels
-
-    # var_dict['global'] = curVars
-    # label_dict['global'] = curLabels
-    # curVars = []
-    # curLabels = []
 
     if(p[1].children[0] != None):
         for vd in p[1].children:
@@ -93,9 +65,6 @@ def p_varlist(p):
     varlist : ID COMMA varlist
             | ID
     '''
-
-    global curVars
-    curVars.append(p[1])
     
     if(len(p) > 2):
         p[0] = Node('varlist', [p[1], p[3].children[0]])
@@ -120,11 +89,6 @@ def p_procdecl(p):
     '''
     procdecl    : PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
     '''
-    global curVars
-    global curLabels
-
-    # var_dict[p[2]] = curVars
-    # label_dict[p[2]] = curLabels
 
     if(p[6].children[0] != None):
         for vd in p[6].children:
@@ -132,8 +96,12 @@ def p_procdecl(p):
                 for variable in vl.children:
                     var_dict[p[2]].append(variable)
 
-    curVars = []
-    curLabels = []
+    if(p[4].children[0] != None):
+        tpl = p[4].children[0]
+        for parameter in tpl.children:
+            if(parameter == None):
+                continue
+            param_dict[p[2]].append(parameter.children[1])
 
     if (p[4].children[0] == None): # If param list is empty
         if (p[6].children[0] == None): # If variable list is empty
@@ -152,7 +120,6 @@ def p_paramlist(p):
     paramlist   : tparamlist
                 | empty
     '''
-    
 
     p[0] = Node('paramlist', [p[1]])
 
@@ -162,11 +129,11 @@ def p_tparamlist(p):
                 | param
     '''
 
-    if (len(p) == 4):
-        p[0] = Node('tparamlist', [p[1], p[3]])
-        
+    if(len(p) > 2):
+        p[0] = Node('tparamlist', [p[1], p[3].children[0]])
     else:
         p[0] = Node('tparamlist', [p[1]])
+
 
 def p_param(p):
     '''
@@ -175,7 +142,6 @@ def p_param(p):
 
     p[0] = Node('param', [p[1], p[2]])
     
-    curVars.append(p[2])
 
 def p_mode(p):
     '''
@@ -215,8 +181,6 @@ def p_pstmt(p):
     '''
 
     p[0] = Node('pstmt', [p[1]])
-    if(p[1] in labels):
-        curLabels.append(p[1])
 
 def p_mstmt(p):
     '''
@@ -225,8 +189,6 @@ def p_mstmt(p):
     '''
 
     p[0] = Node('mstmt', [p[1]])
-    if(p[1] in labels):
-        curLabels.append(p[1])
 
 def p_stmt(p):
     '''
@@ -376,7 +338,7 @@ exit ;
 end
 '''
 
-res = parser.parse(data, lexer)
+res = parser.parse(ezy_input, lexer)
 
 ast = deque()
 
@@ -401,9 +363,46 @@ def generate_parse_tree(ast):
         print()
 # generate_parse_tree(ast)
 
+def semantic_check_345(lexer, ezy_input):
+    lexer = lex.lex() # building the lexer
+    lexer.input(ezy_input) # feeding our ezy program into the lexer
+
+    inProc  = False
+    curProc = None
+    while True:
+        tok = lexer.token()
+        if not tok:
+            print("Semantic check 3 OK")
+            print("Semantic check 4 OK")
+            print("Semantic check 5 OK")
+            break      # No more input
+        if(tok.value == 'proc'):
+            assert(inProc == False)
+            inProc = True
+            continue
+    
+        if(inProc == False):
+            continue
+
+        if(inProc == True):
+            if(curProc == None):
+                assert(tok.type == 'ID')
+                curProc = tok.value
+                continue
+            else:
+                if(tok.type == 'ID'):
+                    if((tok.value not in var_dict[curProc]) and (tok.value not in param_dict[curProc]) and (tok.value not in var_dict['global'])):
+                        print(f"Variable '{tok.value}' in proc '{curProc}' has not been defined!")
+                        exit(0)
+                if(tok.value == 'return'):
+                    inProc = False
+                    curProc = None
+
+
+semantic_check_345(lexer, ezy_input)
+    
+
 # getting var_dict for each proc (and global scope) works!
-for key in var_dict:
-    print(key, var_dict[key])
     
 
 

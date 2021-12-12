@@ -100,7 +100,7 @@ def get_labels(data):
         else:
             if(s[-1] == ':'): # checking if last character is a colon => we've encountered a label definition
                 if(s[:-1] in labels): # Semantic Check: ensuring the encountered label has not been previously defined
-                    print(f"Error: redifinition of label '{s[:-1]}' ")
+                    print(f"Error: redefinition of label '{s[:-1]}' ")
                     exit(0)
                 else:
                     labels.append(s[:-1]) # update the list of labels
@@ -151,6 +151,7 @@ get_procs(ezy_input.split())    # updating the procs list
 
 var_dict = {key: [] for key in procs}   # initialising the variable dictionary for each process scope
 label_dict = {key: [] for key in procs} # initialising the labels dictionary for each process scope
+param_dict = {key: [] for key in procs}
 
 
 
@@ -232,7 +233,8 @@ def tokenize(lexer):
 
 
 # uncomment below function call to see the tokenisation take place
-tokenize(lexer) 
+# tokenize(lexer) 
+
 
 
 
