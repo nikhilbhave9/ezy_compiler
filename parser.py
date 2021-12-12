@@ -1,18 +1,14 @@
 import lexical_analyser
 from lexical_analyser import *
-# from lexical_analyser import tokens
-# from lexical_analyser import lexer
-# from lexical_analyser import procs
-# from lexical_analyser import var_dict
-# from lexical_analyser import label_dict
-# from lexical_analyser import labels
-# from lexical_analyser import ezy_input
 import ply.lex as lex
 import ply.yacc as yacc
 from collections import deque
 import sys
 
 
+#----------------------------------------------------------------------------------------------
+#======================= Defining Structure for Each Node in Parse Tree =======================
+#----------------------------------------------------------------------------------------------
 class Node:
     def __init__(self,type,children=None):
          self.type = type
@@ -21,17 +17,21 @@ class Node:
          else:
               self.children = [ ]
 
-start = 'prog'
+
+#----------------------------------------------------------------------------------------------
+#========================== Defining Rules for CFG of EZY Language ===========================
+#----------------------------------------------------------------------------------------------
+start = 'prog' # start symbol for the CFG
 
 def p_prog(p):
     '''
     prog    : vardecls procdecls BEGIN stmtlist END
     '''
 
-    if(p[1].children[0] != None):
-        for vd in p[1].children:
-            for vl in vd.children:
-                for variable in vl.children:
+    if(p[1].children[0] != None):   # vardecls is not empty
+        for vd in p[1].children:    # iterating through each vardecl
+            for vl in vd.children:  # iterating through each varlist of each vardecl
+                for variable in vl.children:    # iterating through each variable in the varlist and adding it to var_dict['global]
                     var_dict['global'].append(variable)
     p[0] = Node('prog', [p[1], p[2], p[3], p[4], p[5]])
 
@@ -44,13 +44,13 @@ def p_vardecls(p):
     vardecls    : vardecl vardecls
                 | empty
     '''
-
-    if(len(p) == 3):
-        if(p[2].children[0] == None):
+    if(len(p) == 3): # the production used is "vardecls -> vardcl vardecls"
+        if(p[2].children[0] == None): # there is only a single vardecl
             p[0] = Node('vardecls', [p[1]])
-        else:
+        else: # there are multiple vardecl
             p[0] = Node('vardecls', [p[1], p[2].children[0]])
-    else:
+
+    else: # the production used is "vardecls -> empty"
         p[0] = Node('vardecls', [p[1]])
 
 def p_vardecl(p):
@@ -66,9 +66,10 @@ def p_varlist(p):
             | ID
     '''
     
-    if(len(p) > 2):
-        p[0] = Node('varlist', [p[1], p[3].children[0]])
-    else:
+    if(len(p) > 2): # the production used is "varlist -> ID COMMA varlist"
+        p[0] = Node('varlist', [p[1], p[3].children[0]]) # the children of varlist are all the individual variables
+
+    else: # the production used is "varlist -> ID"
         p[0] = Node('varlist', [p[1]])
 
 def p_procdecls(p):
@@ -76,12 +77,13 @@ def p_procdecls(p):
     procdecls   : procdecl procdecls
                 | empty
     '''
-    if(len(p) == 3):
+    if(len(p) == 3): # the production used is "procdecls -> procdecl procdecls"
         if(p[2].children[0] == None):
             p[0] = Node('procdecls', [p[1]])
         else:
             p[0] = Node('procdecls', [p[1], p[2].children[0]])
-    else:
+
+    else: # the production used is "procdecls -> empty"
         p[0] = Node('procdecls', [p[1]])
 
 # ======================Nikhil's Bit======================
@@ -90,15 +92,20 @@ def p_procdecl(p):
     procdecl    : PROC ID LPAREN paramlist RPAREN vardecls pstmtlist
     '''
 
-    if(p[6].children[0] != None):
-        for vd in p[6].children:
-            for vl in vd.children:
-                for variable in vl.children:
-                    var_dict[p[2]].append(variable)
+    # updating the list of variables declared in current procedure
 
-    if(p[4].children[0] != None):
-        tpl = p[4].children[0]
-        for parameter in tpl.children:
+    if(p[6].children[0] != None):   # vardecls is non empty
+        for vd in p[6].children:    # iterating through each vardecl
+            for vl in vd.children:  # iterating through each varlist in each vardecl
+                for variable in vl.children:    # iterating through each variable name in the varlist
+                    var_dict[p[2]].append(variable) 
+
+
+    # updating the list of params of current procedure
+
+    if(p[4].children[0] != None): 
+        tpl = p[4].children[0]  # tpl refers to the tparamlist child of paramlist
+        for parameter in tpl.children:  # iterating through each parameter 
             if(parameter == None):
                 continue
             param_dict[p[2]].append(parameter.children[1])
@@ -107,7 +114,7 @@ def p_procdecl(p):
         if (p[6].children[0] == None): # If variable list is empty
             p[0] = Node('procdecl', [p[2], p[7]])
         else:
-            p[0] = Node('procdecl', [p[2], p[6], p[7]]) # (p[6][0]?)
+            p[0] = Node('procdecl', [p[2], p[6], p[7]]) 
     else: # If param list is non-empty
         if (p[6].children[0] == None): # If variable list is empty
             p[0] = Node('procdecl', [p[2], p[4], p[7]])
@@ -215,12 +222,8 @@ def p_condjump(p):
     '''
     p[0] = Node('condjump', [p[2], p[3], p[4], p[6]])
     if(p[6] not in labels):
-        print(f"Error! label '{p[6]}' has not been defined")
+        print(f"Error: Semantic Check 9 Failed: label '{p[2]}' has not been defined")
         exit(0)
-
-# ======================End Nikhil's Bit======================
-
-# # ======================Nishant's Bit======================
 
 def p_jump(p):
     '''
@@ -228,7 +231,7 @@ def p_jump(p):
     '''
     p[0] = Node('jump', [p[1], p[2]])
     if(p[2] not in labels):
-        print(f"Error! label '{p[2]}' has not been defined")
+        print(f"Error: Semantic Check 9 Failed: label '{p[2]}' has not been defined")
         exit(0)
 
 def p_readstmt(p):
@@ -303,67 +306,29 @@ def p_opd(p):
         | NUM
     '''
     p[0] = Node('opd', [p[1]])
-# ======================End Nishant's Bit======================
+
 def p_error(p):
     print("Syntax error in input!")
 
+#----------------------------------------------------------------------------------------------
+#==================== Constructing the Parser Object and Performing Parsing ===================
+#----------------------------------------------------------------------------------------------
+
 parser = yacc.yacc(debug=True)
 
-data = ''' 
-var a,b;
-var c;
-% following procedure ensures that x<= y on return
-proc order(inout x, inout y)
-var t;
-if x < y goto done;
-t= x+0;
-x = y+0;
-y = t+0;
-done:
-return;
-begin
-print "enter two numbers ";
-println;
-read a ;
-read b ;
-call order(a,b);
-%now a <= b
-c=b/a ;
-c = c*a ;
-c = b - c ;
-print "absolute mod is " ;
-print c;
-println ;
-exit ;
-end
+result = parser.parse(ezy_input, lexer)
+
+#----------------------------------------------------------------------------------------------
+#===================================== Semantic Checking =====================================
+#----------------------------------------------------------------------------------------------
+
 '''
-
-res = parser.parse(ezy_input, lexer)
-
-ast = deque()
-
-ast.append(res)
-
-def generate_parse_tree(ast):
-    while(ast):
-        root = ast.popleft()
-        print(root.type, ': ', end = "")
-        for child in root.children:
-            if(not child):
-                print(None, end = " ")
-                # print(top.type, None)
-                continue
-            if(type(child) != Node):
-                print(child, end=" ")
-                # print(top.type, child)
-            else:
-                print(child.type, end = " ")
-                # print(top.type, child.type)
-                ast.append(child)
-        print()
-# generate_parse_tree(ast)
-
-def semantic_check_345(lexer, ezy_input):
+The following function performs the following 3 semantic checks:-
+    1. Semantic Check 3: All the variables referred must be declared either inside function or as global
+    2. Semantic Check 4: Variables declared in the beginning are global and accessible every where
+    3. Semantic Check 5: Variables not declared inside a function but referred must be declared as global
+'''
+def semantic_check1(lexer, ezy_input):
     lexer = lex.lex() # building the lexer
     lexer.input(ezy_input) # feeding our ezy program into the lexer
 
@@ -392,17 +357,57 @@ def semantic_check_345(lexer, ezy_input):
             else:
                 if(tok.type == 'ID'):
                     if((tok.value not in var_dict[curProc]) and (tok.value not in param_dict[curProc]) and (tok.value not in var_dict['global'])):
-                        print(f"Variable '{tok.value}' in proc '{curProc}' has not been defined!")
+                        print(f"Error: Semantic Checks 3 and 5 failed -- var '{tok.value}' in proc '{curProc}' has not been defined!")
                         exit(0)
                 if(tok.value == 'return'):
                     inProc = False
                     curProc = None
 
+semantic_check1(lexer, ezy_input)
 
-semantic_check_345(lexer, ezy_input)
+
+#----------------------------------------------------------------------------------------------
+#================================= Generating the Parse Tree ==================================
+#----------------------------------------------------------------------------------------------
+
+'''
+The following function takes the result of yacc.py's parser (the root of our parse tree) 
+and walks through all the nodes of the tree in BFS order.
+(i.e),
+If we were to perform BFS on the parse tree generated, and print the name and children of each
+node as we encounter them, the result will be the same.
+'''
+def display_parse_tree(result):
+    ast = deque()
+    ast.append(result)
+    print()
+    print("---------------------------------------------------------------------")
+    print("#============= Begin Parse Tree (Displayed in BFS Order) ============")
+    print("---------------------------------------------------------------------")
+    while(ast):
+        root = ast.popleft()
+        print(root.type, ': ', end = "")
+        for child in root.children:
+            if(not child):
+                print(None, end = " ")
+                # print(top.type, None)
+                continue
+            if(type(child) != Node):
+                print(child, end=" ")
+                # print(top.type, child)
+            else:
+                print(child.type, end = " ")
+                # print(top.type, child.type)
+                ast.append(child)
+        print()
+    print("---------------------------------------------------------------------")
+    print()
+    print()
+
+# uncomment the below function call to see the parse tree printed
+# display_parse_tree(result)
     
 
-# getting var_dict for each proc (and global scope) works!
     
 
 

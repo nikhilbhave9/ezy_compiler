@@ -2,6 +2,19 @@ import ply.lex as lex   #  Lex = Lexer-generator
 import ply.yacc as yacc #  Yacc = Parser-generator
 import sys
 
+'''
+Summary of what lexical_analyser.py does:
+    1. Determines the input of the compiler (i.e), the ezy program to be compiled (see ezy_input)
+    2. Defines a list of tokens using the grammar provided, and performs tokenisation using lex.py
+    3. Does some pre-processing of the input ezy program to obtain:-
+        a. A list of all labels defined in the program
+        b. A list of names of all procedures defined in the program, along with the number of parameters in the function
+
+Semantic checks performed by lexical_analyser.py:
+    1. Semantic Check 8 : No two procedures can have same name
+    2. Semantic Check 10: No label can be defined more than once. In particular, same label can not be used in main
+program and inside a procedure.
+'''
 
 #----------------------------------------------------------------------------------------------
 #==================== Ezy Program Input Used For Lexical Analysis & Parsing ===================
@@ -70,7 +83,7 @@ labels = []
 # Stores the list of names of all procs that have been declared in the ezy program 
 # (using the get_procs() function defined below)
 # the list is initialised with 'global' which refers to the global scope
-procs = ['global']
+procs = [['global', 0]]
 
 
 #----------------------------------------------------------------------------------------------
@@ -100,47 +113,13 @@ def get_labels(data):
         else:
             if(s[-1] == ':'): # checking if last character is a colon => we've encountered a label definition
                 if(s[:-1] in labels): # Semantic Check: ensuring the encountered label has not been previously defined
-                    print(f"Error: redefinition of label '{s[:-1]}' ")
+                    print(f"Error: Semantic Check 10 failed -- redefinition of label '{s[:-1]}' ")
                     exit(0)
                 else:
                     labels.append(s[:-1]) # update the list of labels
 
+    print("Semantic Check 10 OK")
 
-# function that goes through the ezy input program and updates the list of procedure names
-# def get_procs(data):
-#     inPrintStmt = False # flag that tells if current word in ezy input is within a print statement
-#     isProc = False      # flag that tells if current word in ezy input is within a proc's definition
-#     for s in data:
-
-#         # checking if we're within a print statement
-#         if(s[0] == "\"" and inPrintStmt == False):
-#             inPrintStmt = True
-#             continue
-#         elif(s[-1] == "\"" and inPrintStmt == True):
-#             inPrintStmt = False
-#             continue
-        
-#         if(inPrintStmt):
-#             continue
-
-#         # if we're not within a print statement
-#         else:
-#             if s == 'proc':
-#                 isProc = True
-#             else:
-#                 if isProc == True: 
-#                     s_partition = s.partition("(")
-#                     proc_string = s_partition[0]
-
-#                     # semantic Check for duplicate procedures
-#                     # Note: we assume that function overloading is not supported by ezy. This means that
-#                     # regardless of the number and type of parameters, no 2 procedures can have the same name.
-#                     if proc_string in procs:
-#                         print(f"Error: redefinition of procedure '{proc_string}'")
-#                         isProc = False
-#                     else:
-#                         procs.append(proc_string) # updating the list of procedure names
-#                         isProc = False
 
 # function that goes through the ezy input program and updates the list of procedure names
 def get_procs(data):
@@ -149,7 +128,6 @@ def get_procs(data):
     procAdded = False   # flag that tells if the proc name has been added to the proc list but we're still within the function declaration
     stringBuf = ""
     for s in data:
-
         # checking if we're within a print statement
         if(s[0] == "\"" and inPrintStmt == False):
             inPrintStmt = True
@@ -160,38 +138,25 @@ def get_procs(data):
         
         if(inPrintStmt):
             continue
-
         # if we're not within a print statement
         else:
             if s == 'proc':
                 isProc = True
             else:
                 if isProc == True: 
-                    # s_partition = s.partition("(")
-                    # proc_string = s_partition[0]
                     stringBuf += s
                     if s[-1] == ')':
                         isProc = False
-                        procs.append([stringBuf.split('(')[0], len(stringBuf.split(','))])
+                        proc_name = stringBuf.split('(')[0]
+                        for proc in procs:
+                            if(proc[0] == proc_name):
+                                print(f"Error: Semantic check 8 failed -- redefinition of procedure '{proc_name}'")
+                                exit(0)
+                        procs.append([proc_name, len(stringBuf.split(','))])
                         stringBuf = ""                
 
-                        
 
-
-
-
-                    # semantic Check for duplicate procedures
-                    # Note: we assume that function overloading is not supported by ezy. This means that
-                    # regardless of the number and type of parameters, no 2 procedures can have the same name.
-                    # if proc_string in procs:
-                    #     print(f"Error: redefinition of procedure '{proc_string}'")
-                    #     isProc = False
-                    # else:
-                    #     newproc = proc_string
-                    #     numParam = 10 #  Placeholder
-                    #     types = ()
-                    #     procs.append((newproc, numParam, types))) # updating the list of procedure names
-                    #     isProc = False
+    print("Semantic check 8 OK")                
 
 
 
@@ -201,9 +166,9 @@ get_procs(ezy_input.split())    # updating the procs list
 
 # (the below dictionaries will be used later on during parsing for building the symbol table for each scope)
 
-var_dict = {key: [] for key in procs}   # initialising the variable dictionary for each process scope
-label_dict = {key: [] for key in procs} # initialising the labels dictionary for each process scope
-param_dict = {key: [] for key in procs}
+var_dict = {key[0]: [] for key in procs}   # initialising the variable dictionary for each process scope
+label_dict = {key[0]: [] for key in procs} # initialising the labels dictionary for each process scope
+param_dict = {key[0]: [] for key in procs} # initialising the params dictionary for each process scope
 
 
 
