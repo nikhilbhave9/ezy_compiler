@@ -6,6 +6,7 @@ from lexical_analyser import sy_dict
 from lexical_analyser import var_dict
 from lexical_analyser import label_dict
 from lexical_analyser import labels
+from lexical_analyser import ezy_input
 import ply.lex as lex
 import ply.yacc as yacc
 from collections import deque
@@ -346,7 +347,8 @@ def p_error(p):
 
 parser = yacc.yacc(debug=True)
 
-data = ''' var a,b;
+data = ''' 
+var a,b;
 var c;
 % following procedure ensures that x<= y on return
 proc order(inout x, inout y)
@@ -374,21 +376,7 @@ exit ;
 end
 '''
 
-# data2 = '''proc order(inout x, inout y)
-# var t;
-# t=0+1;
-# return;
-# proc order2(inout x, inout y)
-# var a, b;
-# a=0+1;
-# b = 3+2;
-# return;
-# begin
-# print"hi";
-# end
-# '''
 res = parser.parse(data, lexer)
-# print(res)
 
 ast = deque()
 
@@ -413,6 +401,7 @@ def generate_parse_tree(ast):
         print()
 # generate_parse_tree(ast)
 
+# getting var_dict for each proc (and global scope) works!
 for key in var_dict:
     print(key, var_dict[key])
     
